@@ -79,4 +79,4 @@ zip -r physio-anne-theme-vX.Y.Z.zip physio-anne-theme/ -x "*.DS_Store"
 
 **Kunde:** Anne Günthner, Physiotherapeutin  
 **Domain:** physio-anne.at  
-**Entwicklung:** Andre Schade – [andre.schade@massiveart.com](mailto:andre.schade@massiveart.com)
+**Entwicklung:** Andre Schade – [andre@schade.family](mailto:andre@schade.family)
