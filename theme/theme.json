@@ -1,0 +1,134 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 2,
+  "settings": {
+    "appearanceTools": false,
+    "useRootPaddingAwareAlignments": false,
+    "layout": {
+      "contentSize": "none",
+      "wideSize": "none"
+    },
+    "color": {
+      "palette": [
+        { "slug": "primary",       "color": "#9b6ebe", "name": "Primary Lila" },
+        { "slug": "primary-dark",  "color": "#7a4ea0", "name": "Primary Dunkel" },
+        { "slug": "primary-light", "color": "#ede0f2", "name": "Primary Hell" },
+        { "slug": "teal",          "color": "#009ba5", "name": "Teal" },
+        { "slug": "teal-dark",     "color": "#007f88", "name": "Teal Dunkel" },
+        { "slug": "lilac-mid",     "color": "#c8a8d4", "name": "Flieder Mitte" },
+        { "slug": "deep-purple",   "color": "#6b2d8b", "name": "Tiefviolett" },
+        { "slug": "text",          "color": "#2d2d2d", "name": "Text" },
+        { "slug": "text-muted",    "color": "#6b6b6b", "name": "Text Gedämpft" },
+        { "slug": "bg",            "color": "#faf8fb", "name": "Hintergrund" },
+        { "slug": "bg-alt",        "color": "#f2eaf6", "name": "Hintergrund Alt" },
+        { "slug": "footer",        "color": "#4a2060", "name": "Footer Dunkelviolett" },
+        { "slug": "white",         "color": "#ffffff", "name": "Weiß" },
+        { "slug": "border",        "color": "#e2d6ea", "name": "Rahmen" }
+      ],
+      "custom": false,
+      "customDuotone": false,
+      "customGradient": false,
+      "defaultDuotone": false,
+      "defaultGradients": false,
+      "defaultPalette": false
+    },
+    "typography": {
+      "fontFamilies": [
+        {
+          "fontFamily": "'Cormorant Garamond', Georgia, serif",
+          "slug": "cormorant-garamond",
+          "name": "Cormorant Garamond"
+        },
+        {
+          "fontFamily": "'DM Sans', system-ui, sans-serif",
+          "slug": "dm-sans",
+          "name": "DM Sans"
+        }
+      ],
+      "customFontSize": false,
+      "dropCap": false
+    },
+    "spacing": {
+      "units": ["px", "%", "em", "rem"],
+      "customSpacingSize": false
+    },
+    "border": {
+      "color": false,
+      "radius": false,
+      "style": false,
+      "width": false
+    },
+    "blocks": {
+      "core/post-content": {
+        "layout": {
+          "type": "default"
+        }
+      }
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "#faf8fb",
+      "text": "#2d2d2d"
+    },
+    "typography": {
+      "fontFamily": "'DM Sans', system-ui, sans-serif",
+      "fontWeight": "300",
+      "lineHeight": "1.6"
+    },
+    "spacing": {
+      "blockGap": "0"
+    },
+    "blocks": {
+      "core/post-content": {
+        "spacing": {
+          "padding": {
+            "top": "0",
+            "right": "0",
+            "bottom": "0",
+            "left": "0"
+          }
+        }
+      }
+    }
+  },
+  "templateParts": [
+    {
+      "name": "header",
+      "title": "Kopfzeile",
+      "area": "header"
+    },
+    {
+      "name": "footer",
+      "title": "Fußzeile",
+      "area": "footer"
+    }
+  ],
+  "customTemplates": [
+    {
+      "name": "front-page",
+      "title": "Startseite",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page-ueber-mich",
+      "title": "Über mich",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page-leistungen",
+      "title": "Leistungen",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page-kontakt",
+      "title": "Kontakt",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page",
+      "title": "Standard-Seite",
+      "postTypes": ["page"]
+    }
+  ]
+}

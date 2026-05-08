@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Claude Code memory (lokale Entwicklungsnotizen)
+.claude/
+
+# Sensible Daten
+.env
+*.env.local
+
+# Große Backups (nicht ins Repo)
+backup-*.zip
+*_backup.zip
