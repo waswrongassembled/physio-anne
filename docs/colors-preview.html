@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Physio Anne – Design Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sage:    #9b6ebe;
+      --sand:    #009ba5;
+      --text:    #2d2d2d;
+      --bg:      #faf8fb;
+      --bg-alt:  #f2eaf6;
+      --footer:  #4a2060;
+      --white:   #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #e8e8e8; font-family: 'DM Sans', sans-serif; color: var(--text); }
+
+    /* ── LAYOUT ── */
+    .section { padding: 60px 40px; max-width: 960px; margin: 0 auto; }
+    h2.label { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: #999; margin-bottom: 32px; }
+
+    /* ── FARBEN ── */
+    .swatches { display: flex; gap: 16px; flex-wrap: wrap; }
+    .swatch { border-radius: 12px; width: 120px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+    .swatch-color { height: 80px; }
+    .swatch-info { background: white; padding: 10px 12px; }
+    .swatch-name { font-size: 12px; font-weight: 500; }
+    .swatch-hex  { font-size: 11px; color: #999; }
+
+    /* ── TYPOGRAFIE ── */
+    .typo-block { background: var(--white); border-radius: 16px; padding: 48px; box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
+    .typo-block h1 { font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 300; line-height: 1.15; color: var(--text); }
+    .typo-block h2 { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 400; color: var(--sage); margin-top: 24px; }
+    .typo-block h3 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: var(--text); margin-top: 20px; }
+    .typo-block p  { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 300; line-height: 1.75; color: var(--text); margin-top: 16px; max-width: 600px; }
+    .typo-block .caption { font-size: 13px; color: #999; margin-top: 4px; font-weight: 400; }
+
+    /* ── BUTTONS ── */
+    .btn-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+    .btn-primary {
+      display: inline-block; padding: 14px 32px;
+      background: var(--sage); color: white;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.05em;
+      border: none; border-radius: 4px; cursor: pointer; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #7a4ea0; }
+    .btn-outline {
+      display: inline-block; padding: 13px 32px;
+      background: transparent; color: var(--sage);
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.05em;
+      border: 1.5px solid var(--sage); border-radius: 4px; cursor: pointer; text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover { background: var(--sage); color: white; }
+    .btn-sand {
+      display: inline-block; padding: 14px 32px;
+      background: var(--sand); color: white;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.05em;
+      border: none; border-radius: 4px; cursor: pointer; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-sand:hover { background: #007f88; }
+
+    /* ── HERO MOCKUP ── */
+    .hero-mock {
+      background: var(--footer);
+      border-radius: 16px;
+      padding: 80px 60px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.15);
+    }
+    .hero-mock::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(61,90,71,0.95) 0%, rgba(122,158,135,0.6) 100%);
+    }
+    .hero-mock-inner { position: relative; z-index: 1; }
+    .hero-mock .eyebrow {
+      font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--sand); margin-bottom: 20px;
+    }
+    .hero-mock h1 {
+      font-family: 'Cormorant Garamond', serif; font-size: 62px; font-weight: 300;
+      line-height: 1.1; color: white; max-width: 560px; margin-bottom: 16px;
+    }
+    .hero-mock h1 em { font-style: italic; color: #d4b896; }
+    .hero-mock p {
+      font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 300;
+      color: rgba(255,255,255,0.8); max-width: 420px; line-height: 1.7; margin-bottom: 36px;
+    }
+
+    /* ── CARD MOCKUP ── */
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .card {
+      background: white; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    }
+    .card-img { height: 160px; background: var(--bg-alt); display: flex; align-items: center; justify-content: center; }
+    .card-img span { font-size: 40px; }
+    .card-body { padding: 24px; }
+    .card-body h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+    .card-body p { font-size: 14px; font-weight: 300; line-height: 1.65; color: #666; }
+    .card-body a { display: inline-block; margin-top: 16px; font-size: 13px; color: var(--sage); font-weight: 500; text-decoration: none; letter-spacing: 0.05em; }
+
+    /* ── QUOTE ── */
+    .quote-block {
+      background: var(--bg-alt); border-radius: 16px; padding: 40px 48px;
+      border-left: 3px solid var(--sand);
+    }
+    .quote-block blockquote {
+      font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic;
+      font-weight: 400; line-height: 1.6; color: var(--text); margin-bottom: 20px;
+    }
+    .quote-block cite { font-family: 'DM Sans', sans-serif; font-size: 13px; color: #999; font-style: normal; }
+
+    /* ── NAV MOCKUP ── */
+    .nav-mock {
+      background: white; border-radius: 12px; padding: 20px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    }
+    .nav-mock .logo { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 400; color: var(--text); }
+    .nav-mock .logo span { color: var(--sage); }
+    .nav-mock nav { display: flex; gap: 36px; }
+    .nav-mock nav a { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 400; color: var(--text); text-decoration: none; letter-spacing: 0.04em; }
+    .nav-mock nav a:hover { color: var(--sage); }
+    .nav-mock nav a.active { color: var(--sage); }
+
+    /* ── FOOTER MOCKUP ── */
+    .footer-mock { background: var(--footer); border-radius: 16px; padding: 48px; color: white; }
+    .footer-mock h4 { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; margin-bottom: 16px; color: rgba(255,255,255,0.9); }
+    .footer-mock p, .footer-mock a { font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.6); text-decoration: none; line-height: 2; }
+    .footer-mock a:hover { color: var(--sand); }
+    .footer-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); margin-top: 40px; padding-top: 24px; font-size: 13px; color: rgba(255,255,255,0.4); }
+
+    /* ── CANVAS ── */
+    .canvas { background: white; border-radius: 20px; padding: 60px 40px; margin: 20px; box-shadow: 0 4px 40px rgba(0,0,0,0.08); }
+    .canvas + .canvas { margin-top: 0; }
+    .divider { height: 1px; background: #eee; margin: 48px 0; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════ -->
+<div class="canvas">
+  <div class="section" style="padding-top:0">
+
+    <h2 class="label">1 · Farbpalette</h2>
+    <div class="swatches">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#9b6ebe"></div>
+        <div class="swatch-info"><div class="swatch-name">Flieder (PMS 265C)</div><div class="swatch-hex">#9b6ebe · Primärfarbe</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#009ba5"></div>
+        <div class="swatch-info"><div class="swatch-name">Teal (PMS 7710C)</div><div class="swatch-hex">#009ba5 · Akzent</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#2d2d2d"></div>
+        <div class="swatch-info"><div class="swatch-name">Charcoal</div><div class="swatch-hex">#2d2d2d · Text</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#faf8fb; border: 1px solid #eee;"></div>
+        <div class="swatch-info"><div class="swatch-name">Off-White</div><div class="swatch-hex">#faf8fb · Hintergrund</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#f2eaf6"></div>
+        <div class="swatch-info"><div class="swatch-name">Lavendel hell (PMS 263C)</div><div class="swatch-hex">#f2eaf6 · Sektionen</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#4a2060"></div>
+        <div class="swatch-info"><div class="swatch-name">Dunkelviolett (PMS 2613C)</div><div class="swatch-hex">#4a2060 · Footer/Hero</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h2 class="label">2 · Logo – Farbvarianten (Original PNG, nur CSS-Filter)</h2>
+    <p style="font-size:13px;color:#666;margin-bottom:24px;line-height:1.6;">Das Original-Logo bleibt strukturell unverändert. Per CSS-Filter werden nur die Farben verschoben.<br>Für eine pixelgenaue Anpassung wäre die Vektordatei (AI/SVG/EPS) vom Designer nötig.</p>
+    <div style="display:flex; gap:32px; align-items:flex-end; flex-wrap:wrap;">
+
+      <!-- ORIGINAL -->
+      <div style="text-align:center;">
+        <img src="physio-anne-html/assets/logo.png" width="140" height="140">
+        <div style="font-size:11px;color:#999;margin-top:10px;">Original</div>
+      </div>
+
+      <!-- VARIANTE A: hue-rotate(230deg) → Lila→Grün, Türkis→Sand -->
+      <div style="text-align:center;">
+        <img src="physio-anne-html/assets/logo.png" width="140" height="140"
+          style="filter: none;">
+        <div style="font-size:11px;color:#999;margin-top:10px;">Variante A · Sage + Sand<br><span style="color:#bbb;">hue-rotate(230°)</span></div>
+      </div>
+
+      <!-- VARIANTE B: hue-rotate(230deg) + etwas dunkler/satter -->
+      <div style="text-align:center;">
+        <img src="physio-anne-html/assets/logo.png" width="140" height="140"
+          style="filter: none;">
+        <div style="font-size:11px;color:#999;margin-top:10px;">Variante B · satter, dunkler<br><span style="color:#bbb;">hue-rotate(230°) + brightness(0.9)</span></div>
+      </div>
+
+      <!-- VARIANTE C: nur entsättigen → neutral grau/schwarz, zeitlos -->
+      <div style="text-align:center;">
+        <img src="physio-anne-html/assets/logo.png" width="140" height="140"
+          style="filter: saturate(0) brightness(0.4);">
+        <div style="font-size:11px;color:#999;margin-top:10px;">Variante C · Dunkelgrau<br><span style="color:#bbb;">monochrom · zeitlos</span></div>
+      </div>
+
+      <!-- VARIANTE D: Logo auf dunklem BG (weiß) -->
+      <div style="text-align:center; background:#4a2060; padding:20px; border-radius:12px;">
+        <img src="physio-anne-html/assets/logo.png" width="140" height="140"
+          style="filter: brightness(0) invert(1);">
+        <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:10px;">Variante D · Weiß<br><span style="color:rgba(255,255,255,0.3);">für dunklen Hintergrund</span></div>
+      </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <h2 class="label">3 · Navigation (mit Logo Variante A)</h2>
+    <div class="nav-mock">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <img src="physio-anne-html/assets/logo.png" height="52"
+          style="filter: none;">
+      </div>
+      <nav>
+        <a href="#" class="active">Startseite</a>
+        <a href="#">Über mich</a>
+        <a href="#">Leistungen</a>
+        <a href="#">Kontakt</a>
+      </nav>
+      <a href="#" class="btn-primary" style="padding: 10px 24px; font-size: 13px;">Termin anfragen</a>
+    </div>
+
+    <div class="divider"></div>
+
+    <h2 class="label">4 · Typografie</h2>
+    <div class="typo-block">
+      <h1>Ich freue mich,<br>dass Sie hier sind.</h1>
+      <p class="caption">H1 · Cormorant Garamond 300 · 56px</p>
+
+      <h2>Ihre Physiotherapeutin<br>in Feldkirch</h2>
+      <p class="caption">H2 · Cormorant Garamond 400 · 36px · Sage Green</p>
+
+      <h3>Manuelle Therapie</h3>
+      <p class="caption">H3 · Cormorant Garamond 600 · 24px</p>
+
+      <p>In meiner Arbeit steht der Mensch, der zu mir kommt, stets im Vordergrund. Mein Ziel ist es, die Beschwerden des Körpers zu verstehen und Ihnen zu helfen, damit umzugehen – einfühlsam und individuell.</p>
+      <p class="caption" style="margin-top:8px">Body · DM Sans 300 · 16px · 1.75 Zeilenhöhe</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <h2 class="label">5 · Buttons</h2>
+    <div class="btn-row">
+      <a href="#" class="btn-primary">Termin anfragen</a>
+      <a href="#" class="btn-outline">Mehr erfahren</a>
+      <a href="#" class="btn-sand">+43 660 77 44 162</a>
+    </div>
+
+    <div class="divider"></div>
+
+    <h2 class="label">6 · Hero-Bereich (Mockup ohne echtes Bild)</h2>
+    <div class="hero-mock">
+      <div class="hero-mock-inner">
+        <p class="eyebrow">Physiotherapie Feldkirch</p>
+        <h1>Ich freue mich,<br>dass Sie <em>hier</em> sind.</h1>
+        <p>Herzlich Willkommen bei Physio Anne – Ihrer Praxis für individuelle Physiotherapie in Feldkirch.</p>
+        <div class="btn-row">
+          <a href="#" class="btn-sand">Termin anfragen</a>
+          <a href="#" class="btn-outline" style="color:white; border-color:rgba(255,255,255,0.5)">Leistungen entdecken</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h2 class="label">7 · Leistungs-Karten</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-img"><span>🤲</span></div>
+        <div class="card-body">
+          <h3>Manuelle Therapie</h3>
+          <p>Gezielte Handgriffe zur Mobilisierung von Gelenken und Lösung von Verspannungen.</p>
+          <a href="#">Mehr erfahren →</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-img"><span>🏃</span></div>
+        <div class="card-body">
+          <h3>Aktive Übungen</h3>
+          <p>Individuelle Kräftigungs- und Beweglichkeitsübungen für Ihren Körper.</p>
+          <a href="#">Mehr erfahren →</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-img"><span>🌬</span></div>
+        <div class="card-body">
+          <h3>Atemtherapie</h3>
+          <p>Bewusste Atemtechniken zur Verbesserung der Lungenfunktion und Entspannung.</p>
+          <a href="#">Mehr erfahren →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h2 class="label">8 · Testimonial</h2>
+    <div class="quote-block">
+      <blockquote>„Nach meiner Hüft-OP hat mir Anne mit viel Geduld und Fachwissen geholfen, wieder vollständig mobil zu werden. Ich bin sehr dankbar für die einfühlsame Betreuung."</blockquote>
+      <cite>— Patientin, Feldkirch</cite>
+    </div>
+
+    <div class="divider"></div>
+
+    <h2 class="label">9 · Footer</h2>
+    <div class="footer-mock">
+      <div class="footer-grid">
+        <div>
+          <h4>Physio Anne</h4>
+          <p>Ihre Physiotherapeutin<br>in Feldkirch, Vorarlberg.</p>
+        </div>
+        <div>
+          <h4>Kontakt</h4>
+          <p>
+            Grenzweg 10, 6800 Feldkirch<br>
+            <a href="tel:+43660774162">+43 660 77 44 162</a><br>
+            <a href="mailto:info@physio-anne.at">info@physio-anne.at</a>
+          </p>
+        </div>
+        <div>
+          <h4>Rechtliches</h4>
+          <p>
+            <a href="#">Impressum</a><br>
+            <a href="#">Datenschutz</a><br>
+            <a href="#">AGB</a>
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">© 2025 Anne Günthner · Physiotherapeutin · Alle Rechte vorbehalten.</div>
+    </div>
+
+  </div>
+</div>
+<div id="special-days"></div>
+
+<script>
+(async function () {
+  const target = document.getElementById('special-days');
+  if (!target) return;
+
+  const SOURCE_URL = 'https://welcher-tag-ist-heute.org/';
+
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function extractItems(html) {
+    const startMarker = '<div class="inner">';
+    const endMarker = '</div> <!-- .inner -->';
+
+    const start = html.indexOf(startMarker);
+    const end = html.indexOf(endMarker, start);
+
+    if (start === -1 || end === -1) return [];
+
+    const sliderHtml = html.slice(start + startMarker.length, end);
+    const parts = sliderHtml.split('<a href="').slice(1);
+
+    const items = [];
+
+    for (const part of parts) {
+      const hrefEnd = part.indexOf('"');
+      if (hrefEnd === -1) continue;
+
+      const href = part.slice(0, hrefEnd);
+
+      const h2Start = part.indexOf('<h2>');
+      const h2End = part.indexOf('</h2>', h2Start);
+      const pStart = part.indexOf('<p class="text">', h2End);
+      const pEnd = part.indexOf('</p>', pStart);
+
+      if (h2Start === -1 || h2End === -1 || pStart === -1 || pEnd === -1) continue;
+
+      const title = part.slice(h2Start + 4, h2End).replace(/\s+/g, ' ').trim();
+      const description = part.slice(pStart + 16, pEnd).replace(/\s+/g, ' ').trim();
+
+      items.push({
+        title,
+        description,
+        url: href.startsWith('http')
+          ? href
+          : `https://welcher-tag-ist-heute.org/${href.replace(/^\/+/, '')}`
+      });
+    }
+
+    return items;
+  }
+
+  function render(items) {
+    if (!items.length) {
+      target.innerHTML = '<p>Keine Einträge gefunden.</p>';
+      return;
+    }
+
+    target.innerHTML = `
+      <div style="font-family: Arial, sans-serif; max-width: 720px; margin: 0 auto;">
+        <h2 style="margin: 0 0 16px;">Heutige Aktionstage</h2>
+        ${items.map(item => `
+          <article style="border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+            <h3 style="margin: 0 0 8px; font-size: 18px;">
+              <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: #111;">
+                ${escapeHtml(item.title)}
+              </a>
+            </h3>
+            <p style="margin: 0; color: #444; line-height: 1.5;">
+              ${escapeHtml(item.description)}
+            </p>
+          </article>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  try {
+    target.innerHTML = '<p>Lade Inhalte ...</p>';
+
+    const response = await fetch(SOURCE_URL);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const html = await response.text();
+    const items = extractItems(html);
+    render(items);
+  } catch (err) {
+    target.innerHTML = `<p>Inhalte konnten nicht geladen werden: ${escapeHtml(err.message)}</p>`;
+  }
+})();
+</script>
+</body>
+</html>
