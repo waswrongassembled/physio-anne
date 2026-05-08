@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de-AT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kontakt – Physio Anne</title>
+    <meta name="description" content="Kontakt und Terminvereinbarung – Physio Anne, Grenzweg 10, Feldkirch. Tel. +43 660 77 44 162.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caudex:ital,wght@0,400;0,700;1,400&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="page-kontakt">
+    <header class="site-header" role="banner">
+        <div class="header-inner">
+            <a href="index.html" class="site-logo" title="Physio Anne">
+                <img src="assets/logo.png" alt="Physio Anne" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                <span style="display: none;">Physio Anne</span>
+            </a>
+            <button type="button" class="js-nav-toggle" aria-label="Menü öffnen" aria-expanded="false">☰</button>
+            <nav class="nav-main js-nav-main" role="navigation" aria-label="Hauptmenü">
+                <ul>
+                    <li><a href="about.html">ÜBER MICH</a></li>
+                    <li><a href="kontakt.html">KONTAKT</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="section hero hero--kontakt">
+            <h1>Melden Sie sich!</h1>
+            <p><a href="tel:+436607744162" class="hero-phone">+43 660 77 44 162</a></p>
+        </section>
+
+        <section class="section contact-cols">
+            <div class="contact-cols__inner">
+                <div class="contact-col">
+                    <h2 class="section-title">Öffnungszeiten</h2>
+                    <p>Zu folgenden Zeiten finden Sie mich in der Praxis.</p>
+                    <ul class="block-list">
+                        <li>Montag 12:00 – 13:30 Uhr</li>
+                        <li>Dienstag 12:00 – 15:30 Uhr</li>
+                        <li>Mittwoch 12:00 – 13:30 Uhr</li>
+                        <li>Donnerstag: 08:00 – 15:30 Uhr</li>
+                        <li>Freitag: 08:00 – 13:30 Uhr</li>
+                    </ul>
+                </div>
+                <div class="contact-col">
+                    <h2 class="section-title">Terminvereinbarung</h2>
+                    <p>Termine ausschließlich nach Vereinbarung.</p>
+                    <p>
+                        Ich bemühe mich, Ihnen innerhalb dieser Zeiten bestmöglich zur Verfügung zu stehen. Bitte
+                        kontaktieren Sie mich, um einen passenden Termin zu vereinbaren. Ich freue mich darauf, Sie
+                        in meiner Praxis begrüßen zu dürfen!
+                    </p>
+                    <p class="mt-2">
+                        Ich möchte Sie höflich darauf hinweisen, dass ich Termine, die nicht 24 h vorher abgesagt werden,
+                        in Rechnung stellen muss.
+                    </p>
+                    <p>Vielen Dank für Ihr Verständnis.</p>
+                </div>
+                <div class="contact-col">
+                    <h2 class="section-title">Kontakt</h2>
+                    <p>Grenzweg 10,<br>6800 Feldkirch</p>
+                    <p><a href="tel:+436607744162">+43 660 77 44 162</a></p>
+                    <p><strong>E-Mail:</strong> <a href="mailto:info@physio-anne.at">info@physio-anne.at</a></p>
+                    <p class="mt-2">
+                        Die Praxis befindet sich im DLZ-Gebäude, im 1. OG, in den Räumlichkeiten der MedReHa.<br>
+                        <a href="https://www.medreha.at/" target="_blank" rel="noopener">www.medreha.at</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Terminanfragen</h2>
+            <form class="contact-form" action="#" method="post" aria-label="Terminanfrage">
+                <p class="contact-form__row">
+                    <label for="contact-name">Ihre Name</label>
+                    <input id="contact-name" type="text" name="name" class="contact-form__input" required>
+                </p>
+                <p class="contact-form__row">
+                    <label for="contact-email">Ihre E-Mail Adresse</label>
+                    <input id="contact-email" type="email" name="email" class="contact-form__input" required>
+                </p>
+                <p class="contact-form__row">
+                    <label for="contact-phone">Ihre Telefonnummer</label>
+                    <input id="contact-phone" type="tel" name="phone" class="contact-form__input">
+                </p>
+                <p class="contact-form__row">
+                    <label for="contact-subject">Anliegen</label>
+                    <input id="contact-subject" type="text" name="subject" class="contact-form__input">
+                </p>
+                <p class="contact-form__row">
+                    <label for="contact-message">Weitere Informationen</label>
+                    <textarea id="contact-message" name="message" class="contact-form__input contact-form__textarea" rows="5"></textarea>
+                </p>
+                <p class="contact-form__row contact-form__submit">
+                    <button type="submit" class="btn">Terminanfrage senden</button>
+                </p>
+            </form>
+        </section>
+
+        <section class="section map-placeholder">
+            <p class="text-center">Karte (z. B. Google Maps): Grenzweg 10, 6800 Feldkirch</p>
+        </section>
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-wave" aria-hidden="true"></div>
+        <div class="footer-inner">
+            <p class="footer-intro">
+                Ich freue mich mit Ihnen arbeiten zu dürfen.<br>
+                <a href="tel:+436607744162">+43 660 77 44 162</a> | <a href="mailto:info@physio-anne.at">info@physio-anne.at</a>
+            </p>
+            <p class="footer-copyright">
+                Copyright Anne Günthner | <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> |
+                <a href="agbs.html">AGBs</a> | Webdesign by <a href="https://solid4.at/" target="_blank" rel="noopener">solid4</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

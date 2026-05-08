@@ -1,0 +1,24 @@
+{
+  "name": "Physio Anne – Physiotherapie Feldkirch",
+  "short_name": "Physio Anne",
+  "description": "Ihre Physiotherapeutin in Feldkirch. Anne Günthner – individuell, kompetent, menschlich.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#faf8fb",
+  "theme_color": "#9b6ebe",
+  "lang": "de-AT",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

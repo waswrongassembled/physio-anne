@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://physio-anne.at/sitemap.xml

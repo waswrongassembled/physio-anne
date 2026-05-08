@@ -1,5 +1,23 @@
 # Design-System – Physio Anne Theme
 
+## Corporate Identity
+
+Vollständiges CI-Dokument (Logo, Visitenkarte, Briefpapier, Kuvert):  
+→ [`docs/ci/physio-anne-corporate-identity.pdf`](ci/physio-anne-corporate-identity.pdf)
+
+### Original CI-Farbe (vor Website-Redesign)
+Die CI-Unterlagen zeigen **Teal** (`#4a7c7e` / Blau-Grün) als Primärfarbe.  
+Beim WordPress-Redesign (März 2026) wurde die Website-Primärfarbe auf **Lila** (`#6b2d8b`) umgestellt – auf Wunsch der Kundin. Teal blieb als Akzentfarbe erhalten.
+
+| CI-Element | Farbe |
+|---|---|
+| Logo, Schrift | Teal/Slate |
+| Hintergründe (Karte, Kuvert) | Teal dunkel |
+| Briefpapier Seitenleiste | Teal dunkel |
+
+---
+
+
 ---
 
 ## Farben

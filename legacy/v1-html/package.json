@@ -1,0 +1,10 @@
+{
+  "name": "physio-anne-html",
+  "private": true,
+  "scripts": {
+    "screenshots:live": "node scripts/screenshot-live.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}

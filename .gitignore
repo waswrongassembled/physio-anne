@@ -17,3 +17,7 @@
 # Große Backups (nicht ins Repo)
 backup-*.zip
 *_backup.zip
+
+# Node
+node_modules/
+npm-debug.log
