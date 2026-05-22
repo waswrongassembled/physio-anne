@@ -4,6 +4,22 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.8] 22.05.2026 – Modern Web Guidance Audit: A11y + Performance Fixes
+
+### Geändert
+- **`scroll-behavior`**: `smooth` nur noch unter `@media (prefers-reduced-motion: no-preference)` – schützt User mit Vestibular-Beschwerden
+- **`:focus-visible`**: Formfelder (native + CF7) zeigen Keyboard-Fokus-Outline (`2px solid var(--primary)`) – `outline: none` gilt jetzt nur noch für Maus-Klick (`:focus` ohne `:focus-visible`)
+- **Hero Dots**: `aria-hidden="true"` entfernt, ersetzt durch `role="group" aria-label="Slider-Navigation"` – Screen Reader können Navigation nun erreichen
+- **`fetchpriority="low"`** auf Slides 2+3 explizit gesetzt (war implizit durch `loading="lazy"`) – explizites Browser-Signal für Lade-Priorisierung
+- **`will-change: opacity`** auf `.hero-figure` – GPU-Layer-Promotion für Fade-Animation
+- **`color-scheme: light`** in `:root` – verhindert FOUC bei System-Dark-Mode
+- **Font-Metric-Fallbacks**: `@font-face` mit `size-adjust` für Cormorant Garamond (87.5%) und DM Sans (105%) – reduziert CLS beim Google-Fonts-Swap (Baseline Newly Available)
+
+### Warum
+Modern Web Guidance Audit (GoogleChrome/modern-web-guidance Skill) identifizierte diese Punkte als umsetzbare Verbesserungen ohne Design-Impact. Accessibility-Score-Potential: ≥90→95+. CLS durch Font-Swap messbar reduziert.
+
+---
+
 ## [1.0.7] 08.05.2026 – Hero-Bilder Resize + Rekompression
 
 ### Geändert

@@ -11,6 +11,24 @@
 .editor-styles-wrapper .wp-block { max-width: none; }
 
 /* ── Custom Properties ── */
+/* ── Font-Metric-Fallbacks (verhindert CLS beim Google-Fonts-Swap) ── */
+@font-face {
+  font-family: 'Cormorant Garamond Fallback';
+  src: local('Georgia');
+  size-adjust: 87.5%;
+  ascent-override: 92%;
+  descent-override: 28%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('system-ui'), local('-apple-system'), local('Segoe UI');
+  size-adjust: 105%;
+  ascent-override: 96%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+
 :root {
   /* Colors – Brand Physio Anne (Pantone-basiert) */
   --primary:       #9b6ebe;   /* Pantone 265C  – Hauptakzent Flieder/Lila       */
@@ -29,8 +47,10 @@
   --border:        #e2d6ea;
 
   /* Typography */
-  --font-serif:  'Cormorant Garamond', Georgia, serif;
-  --font-sans:   'DM Sans', system-ui, sans-serif;
+  --font-serif:  'Cormorant Garamond', 'Cormorant Garamond Fallback', Georgia, serif;
+  --font-sans:   'DM Sans', 'DM Sans Fallback', system-ui, sans-serif;
+
+  color-scheme: light;
 
   /* Spacing */
   --space-xs:   8px;
@@ -54,7 +74,10 @@
 
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; font-size: 16px; }
+html { scroll-behavior: auto; font-size: 16px; }
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
 body {
   font-family: var(--font-sans);
   font-weight: 300;
@@ -343,6 +366,7 @@ p { line-height: 1.75; }
   transition: opacity 1.2s ease;
   display: flex;
   align-items: flex-end;
+  will-change: opacity;
 }
 .hero-figure.active { opacity: 1; }
 .hero-figure img {
@@ -821,6 +845,12 @@ p { line-height: 1.75; }
   outline: none;
   border-color: var(--primary);
 }
+.form-group input:focus-visible,
+.form-group select:focus-visible,
+.form-group textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
 .form-group textarea { resize: vertical; min-height: 130px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm); }
 
@@ -858,6 +888,13 @@ p { line-height: 1.75; }
 .wpcf7-form .wpcf7-textarea:focus {
   outline: none;
   border-color: var(--primary);
+}
+.wpcf7-form .wpcf7-text:focus-visible,
+.wpcf7-form .wpcf7-email:focus-visible,
+.wpcf7-form .wpcf7-tel:focus-visible,
+.wpcf7-form .wpcf7-textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 .wpcf7-form .wpcf7-textarea { resize: vertical; min-height: 130px; max-height: 180px; height: 130px; }
 .wpcf7-form .wpcf7-submit {
