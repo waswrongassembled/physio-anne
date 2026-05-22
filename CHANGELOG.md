@@ -4,6 +4,22 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.9] 22.05.2026 – Lighthouse Audit: PageSpeed-Fix, Heading-Order, Color-Contrast
+
+### Geändert
+- **`data-pagespeed-no-transform`** auf alle Hero- und Service-Card-Bilder: verhindert, dass das PageSpeed-Modul `<picture>` auflöst und unkomprimierte Original-PNGs (~16 MB) ausliefert – war Hauptursache für LCP 83 s (mobile)
+- **Heading-Order** h4 → h3: `intro-strip.php` (Menschlich / Kompetent / Individuell) und `footer.html` (Kontakt / Navigation) – kein h1→h4-Sprung mehr; CSS-Größen erhalten
+- **Color Contrast WCAG AA**:
+  - `btn-primary`: `background: var(--primary-dark)` (#7a4ea0, 6,0:1 mit Weiß), hover `var(--deep-purple)`
+  - `btn-accent`: `background: var(--teal-dark)` (#007f88, 4,77:1 mit Weiß), hover `#005f66`
+  - `btn-outline`: `color/border: var(--primary-dark)`, hover-Hintergrund `var(--primary-dark)`
+  - `.pricing-note a`: `color: var(--primary-dark); text-decoration: underline`
+
+### Warum
+Lighthouse Desktop (22.05.2026): Accessibility 90 → Ziel ≥95. PageSpeed-Modul rewrite von `<picture>` blockierte WebP-Auslieferung. WCAG-Violations bei Buttons (Teal + Lila hatten &lt;4,5:1 Kontrast). Heading-Sprung h1→h4 verletzt WCAG 1.3.1.
+
+---
+
 ## [1.0.8] 22.05.2026 – Modern Web Guidance Audit: A11y + Performance Fixes
 
 ### Geändert

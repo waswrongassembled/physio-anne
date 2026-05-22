@@ -19,7 +19,7 @@
         <div class="service-card-img">
           <picture>
             <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-manuelle.webp" type="image/webp">
-            <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-manuelle.jpg" alt="Manuelle Therapie" loading="lazy" width="2048" height="1363">
+            <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-manuelle.jpg" alt="Manuelle Therapie" loading="lazy" width="2048" height="1363" data-pagespeed-no-transform>
           </picture>
         </div>
         <div class="service-card-body">
@@ -31,7 +31,7 @@
         <div class="service-card-img">
           <picture>
             <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-uebungen.webp" type="image/webp">
-            <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-uebungen.jpg" alt="Aktive Übungen" loading="lazy" width="2048" height="1363">
+            <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-uebungen.jpg" alt="Aktive Übungen" loading="lazy" width="2048" height="1363" data-pagespeed-no-transform>
           </picture>
         </div>
         <div class="service-card-body">
@@ -43,7 +43,7 @@
         <div class="service-card-img">
           <picture>
             <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-atem.webp" type="image/webp">
-            <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-atem.jpg" alt="Atemtherapie" loading="lazy" width="2048" height="1363">
+            <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-atem.jpg" alt="Atemtherapie" loading="lazy" width="2048" height="1363" data-pagespeed-no-transform>
           </picture>
         </div>
         <div class="service-card-body">
@@ -55,7 +55,7 @@
         <div class="service-card-img">
           <picture>
             <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-beckenboden.webp" type="image/webp">
-            <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-beckenboden.jpg" alt="Beckenbodentherapie" loading="lazy" width="2048" height="1362">
+            <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-beckenboden.jpg" alt="Beckenbodentherapie" loading="lazy" width="2048" height="1362" data-pagespeed-no-transform>
           </picture>
         </div>
         <div class="service-card-body">
