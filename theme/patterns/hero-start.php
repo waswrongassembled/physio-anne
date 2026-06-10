@@ -16,21 +16,21 @@
       <picture>
         <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero-slide1-sm.webp" type="image/webp" media="(max-width: 768px)">
         <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero-slide1.webp" type="image/webp">
-        <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero-slide1.png" alt="" loading="eager" fetchpriority="high">
+        <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero-slide1.png" alt="" loading="eager" fetchpriority="high" width="545" height="1600" data-pagespeed-no-transform>
       </picture>
     </div>
     <div class="hero-figure">
       <picture>
         <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero-slide2-sm.webp" type="image/webp" media="(max-width: 768px)">
         <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero-slide2.webp" type="image/webp">
-        <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero-slide2.png" alt="" loading="lazy" fetchpriority="low">
+        <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero-slide2.png" alt="" loading="lazy" fetchpriority="low" width="1692" height="1600" data-pagespeed-no-transform>
       </picture>
     </div>
     <div class="hero-figure">
       <picture>
         <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero-slide3-sm.webp" type="image/webp" media="(max-width: 768px)">
         <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero-slide3.webp" type="image/webp">
-        <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero-slide3.png" alt="" loading="lazy" fetchpriority="low">
+        <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero-slide3.png" alt="" loading="lazy" fetchpriority="low" width="716" height="1600" data-pagespeed-no-transform>
       </picture>
     </div>
   </div>

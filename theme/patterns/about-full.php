@@ -41,6 +41,10 @@
           </li>
           <li class="credential-item">
             <span class="credential-dot"></span>
+            <span>Mitglied bei Physio Austria – Bundesverband der PhysiotherapeutInnen Österreichs (seit 2026)</span>
+          </li>
+          <li class="credential-item">
+            <span class="credential-dot"></span>
             <span>Freiberuflich tätig seit Juni 2024 in Feldkirch</span>
           </li>
           <li class="credential-item">

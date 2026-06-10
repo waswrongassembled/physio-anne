@@ -144,30 +144,30 @@ p { line-height: 1.75; }
   white-space: nowrap;
 }
 .btn-primary {
-  background: var(--primary);
-  color: var(--white);
-  border-color: var(--primary);
-}
-.btn-primary:hover {
   background: var(--primary-dark);
+  color: var(--white);
   border-color: var(--primary-dark);
 }
+.btn-primary:hover {
+  background: var(--deep-purple);
+  border-color: var(--deep-purple);
+}
 .btn-accent {
-  background: var(--teal);
+  background: var(--teal-dark);
   color: var(--white);
-  border-color: var(--teal);
+  border-color: var(--teal-dark);
 }
 .btn-accent:hover {
-  background: var(--teal-dark);
-  border-color: var(--teal-dark);
+  background: #005f66;
+  border-color: #005f66;
 }
 .btn-outline {
   background: transparent;
-  color: var(--primary);
-  border-color: var(--primary);
+  color: var(--primary-dark);
+  border-color: var(--primary-dark);
 }
 .btn-outline:hover {
-  background: var(--primary);
+  background: var(--primary-dark);
   color: var(--white);
 }
 .btn-outline-white {
@@ -441,7 +441,7 @@ p { line-height: 1.75; }
     bottom: auto; left: auto;
     transform: none;
     justify-content: center;
-    margin: 0 0 16px;
+    margin: 0 0 32px;
     background: var(--bg-alt);
     padding: 10px 0;
   }
@@ -470,7 +470,7 @@ p { line-height: 1.75; }
   display: flex; align-items: center; justify-content: center;
 }
 .intro-item-icon svg { width: 24px; height: 24px; stroke: var(--primary); fill: none; stroke-width: 1.5; }
-.intro-item h4 {
+.intro-item h3 {
   font-family: var(--font-serif);
   font-size: 20px;
   margin-bottom: 8px;
@@ -636,7 +636,7 @@ p { line-height: 1.75; }
   text-align: center;
   line-height: 1.7;
 }
-.pricing-note a { color: var(--primary); text-decoration: underline; }
+.pricing-note a { color: var(--primary-dark); text-decoration: underline; }
 .section--pricing,
 .section:has(.pricing-note) { padding-bottom: var(--space-xl); }
 
@@ -715,7 +715,7 @@ p { line-height: 1.75; }
   color: rgba(255,255,255,0.55);
   line-height: 1.65;
 }
-.footer-col h4 {
+.footer-col h3 {
   font-family: var(--font-serif);
   font-size: 18px;
   font-weight: 400;
@@ -1095,7 +1095,7 @@ p { line-height: 1.75; }
   .main-nav { display: none; }
   .header-cta { display: none; }
   .hamburger { display: flex; }
-  .intro-strip-grid { grid-template-columns: 1fr; gap: 0; }
+  .intro-strip-grid { grid-template-columns: 1fr; gap: var(--space-md); }
   .testimonials-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
   .hero { max-height: 700px; }

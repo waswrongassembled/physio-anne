@@ -4,6 +4,20 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.10] 10.06.2026 – Feedback Anne: Verbands-Mitgliedschaft, Preistabelle-Korrektur, Mobile-Abstand
+
+### Geändert
+- **Preistabelle – additiv-Markierung korrigiert** (`pricing-table.php`, `pricing-table-white.php`, `services-full.php`): Stern (*) von Elektrotherapie zu Heilmassage verschoben. Heilmassage ist bei ÖGK und BVAEB nur additiv (eigener Posten = Elektrotherapie). ÖGK/BVAEB-Werte der Heilmassage erhalten `*`, Elektrotherapie verliert ihn; Fußnote entsprechend von „Elektrotherapie" auf „Heilmassage" geändert.
+- **Mobile-Abstand Hero → Werte-Strip** (`assets/css/style.css`): `hero-dots` margin-bottom 16 → 32px; gestapelte `intro-strip`-Items mit `gap: var(--space-md)` statt 0 – mehr Luft zwischen Slider-Dots und „Menschlich/Kompetent/Individuell" auf Mobile.
+
+### Hinzugefügt
+- **Physio-Austria-Mitgliedschaft** (`about-full.php`): neuer Qualifikations-Eintrag „Mitglied bei Physio Austria – Bundesverband der PhysiotherapeutInnen Österreichs (seit 2026)" auf der Über-mich-Seite.
+
+### Nachgezogen (aus 1.0.9 noch nicht committet)
+- WCAG-Kontrast-Buttons (`btn-primary`/`btn-accent`/`btn-outline` auf `*-dark`), Heading-Order h4 → h3 (`intro-strip.php`, `footer.html`), `data-pagespeed-no-transform` auf Hero-Bilder (`hero-start.php`) – Quelländerungen zu 1.0.9, die im Working-Tree lagen.
+
+---
+
 ## [1.0.9] 22.05.2026 – Lighthouse Audit: PageSpeed-Fix, Heading-Order, Color-Contrast
 
 ### Geändert
