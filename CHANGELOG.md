@@ -4,6 +4,13 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.11] 10.06.2026 – Fix: Hero/Intro-Overlap auf Startseite (Mobile)
+
+### Behoben
+- **Hero überlappte Werte-Strip auf Mobile** (`assets/css/style.css`): `.hero { max-height: 700px }` im 768px-Media-Query entfernt. Zusammen mit `overflow: visible` kappte die 700px-Grenze die Hero-Box, während der Inhalt (Text + Buttons + 360px-Figur + Dots) darüber hinauslief und den Anfang des `intro-strip` verdeckte – Icon + Überschrift „Menschlich" waren unsichtbar. Hero wächst auf Mobile jetzt mit dem Inhalt (`height: auto`, `max-height: none`).
+
+---
+
 ## [1.0.10] 10.06.2026 – Feedback Anne: Verbands-Mitgliedschaft, Preistabelle-Korrektur, Mobile-Abstand
 
 ### Geändert

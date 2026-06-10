@@ -1098,7 +1098,6 @@ p { line-height: 1.75; }
   .intro-strip-grid { grid-template-columns: 1fr; gap: var(--space-md); }
   .testimonials-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
-  .hero { max-height: 700px; }
   .form-row { grid-template-columns: 1fr; }
   .cta-banner .hours-grid { gap: 24px; }
   .footer-bottom { flex-direction: column; text-align: center; }
