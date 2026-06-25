@@ -4,6 +4,13 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.12] 25.06.2026 – Preistabelle: Heilmassage auch bei SVS nur additiv
+
+### Geändert
+- **SVS-Markierung Heilmassage** (`pricing-table.php`, `pricing-table-white.php`, `services-full.php`): SVS-Rückerstattung der Heilmassage (€ 9,13) erhält den additiv-Stern (`* € 9,13`). Fußnote von „bei ÖGK und BVAEB" auf „bei ÖGK, BVAEB und SVS" geändert. Heilmassage ist nun in allen drei Kassen als nur additiv ausgewiesen.
+
+---
+
 ## [1.0.11] 10.06.2026 – Fix: Hero/Intro-Overlap auf Startseite (Mobile)
 
 ### Behoben

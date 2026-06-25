@@ -81,7 +81,7 @@
         <td class="price-highlight">€ 27,00</td>
         <td>* € 8,10</td>
         <td>* € 10,12</td>
-        <td>€ 9,13</td>
+        <td>* € 9,13</td>
       </tr>
       <tr>
         <td>Elektrotherapie</td>
@@ -97,7 +97,7 @@
 <p class="pricing-note">
   Alle Preise ohne Umsatzsteuer (USt-befreit gem. § 6 Abs. 1 Z 19 UStG) · Für eine Behandlung ist eine ärztliche Zuweisung (Überweisung) erforderlich.<br>
   Die Rückerstattungsbeträge für ÖGK, BVAEB und SVS sind Richtwerte – bitte erkundigen Sie sich bei Ihrer Kasse.<br>
-  * Heilmassage ist bei ÖGK und BVAEB nur additiv (zusätzlich zu einer Hauptleistung) und eingeschränkt erstattbar.<br>
+  * Heilmassage ist bei ÖGK, BVAEB und SVS nur additiv (zusätzlich zu einer Hauptleistung) und eingeschränkt erstattbar.<br>
   <strong>KFA-versichert?</strong> Rückerstattungstarife der Krankenfürsorgeanstalt (KFA) auf Anfrage – <a href="/kontakt/">einfach melden.</a><br>
   <strong>SVS-Versicherte:</strong> Vor dem ersten Termin ist eine Bewilligung der SVS erforderlich.
 </p>
