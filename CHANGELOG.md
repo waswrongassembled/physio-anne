@@ -4,6 +4,14 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.13] 25.06.2026 – Neue 404-Fehlerseite
+
+### Hinzugefügt
+- **404-Template** (`templates/404.html`) + **Pattern** (`patterns/error-404.php`): Professionelle Fehlerseite mit Header/Footer, „Hoppla – diese Seite gibt es nicht."-Hinweis und Buttons „Zur Startseite" / „Kontakt & Termin". Wird in WordPress automatisch bei nicht gefundenen URLs (HTTP 404) ausgespielt.
+- **404-Styles** (`assets/css/style.css`): zentriertes Layout, großer gedämpfter „404"-Code in Teal, responsive Button-Reihe.
+
+---
+
 ## [1.0.12] 25.06.2026 – Preistabelle: Heilmassage auch bei SVS nur additiv
 
 ### Geändert
