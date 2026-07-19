@@ -4,6 +4,16 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.14] 19.07.2026 – SEO: 301-Redirects für Alt-URLs + Sitemap-Cleanup
+
+### Hinzugefügt
+- **301-Redirects** (`functions.php`, Abschnitt F): Alt-URLs der statischen Vorgängerseite (`/leistungen.html`, `/ueber-mich.html`, `/kontakt.html`, `/index.html` usw.) leiten jetzt per 301 auf die neuen Permalinks (`/leistungen/`, …) um statt 404 zu liefern. Erhält bestehende Google-Rankings und Backlinks. Greift nur bei 404 und nur, wenn die Zielseite existiert.
+
+### Geändert
+- **Sitemap-Cleanup** (`functions.php`, Abschnitt G): User- und Taxonomie-Sitemaps deaktiviert (leer/irrelevant), Beitrags-Sitemap entfernt (Seite nutzt keine Posts), noindex-Seiten (Impressum, Datenschutz, AGB) aus der Seiten-Sitemap ausgeschlossen. `wp-sitemap.xml` listet damit nur noch die 4 indexierbaren Seiten – konsistent mit den robots-Metas.
+
+---
+
 ## [1.0.13] 25.06.2026 – Neue 404-Fehlerseite
 
 ### Hinzugefügt

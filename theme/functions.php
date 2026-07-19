@@ -622,3 +622,58 @@ add_action( 'init', function () {
         'description'   => 'Individuelle Meta-Description für diese Seite (max. 160 Zeichen).',
     ] );
 } );
+
+/* ════════════════════════════════════════════════════════════
+   F) 301-REDIRECTS – Alt-URLs der statischen Vorgängerseite
+   /leistungen.html → /leistungen/ usw. (sonst 404, Rankings weg)
+════════════════════════════════════════════════════════════ */
+
+add_action( 'template_redirect', function () {
+    if ( ! is_404() ) {
+        return;
+    }
+
+    $path = wp_parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH );
+    if ( ! $path || ! preg_match( '#^/([a-z0-9-]+)\.html$#i', $path, $m ) ) {
+        return;
+    }
+
+    $slug   = strtolower( $m[1] );
+    $target = ( 'index' === $slug ) ? home_url( '/' ) : home_url( '/' . $slug . '/' );
+
+    // Nur auf tatsächlich existierende Seiten umleiten
+    if ( 'index' !== $slug && ! get_page_by_path( $slug ) ) {
+        return;
+    }
+
+    wp_safe_redirect( $target, 301 );
+    exit;
+}, 5 );
+
+/* ════════════════════════════════════════════════════════════
+   G) SITEMAP-CLEANUP – nur indexierbare Seiten listen
+════════════════════════════════════════════════════════════ */
+
+// User- und Taxonomie-Sitemaps deaktivieren (leer bzw. irrelevant)
+add_filter( 'wp_sitemaps_add_provider', function ( $provider, $name ) {
+    return in_array( $name, [ 'users', 'taxonomies' ], true ) ? false : $provider;
+}, 10, 2 );
+
+// Beitrags-Sitemap deaktivieren – Seite nutzt keine Posts
+add_filter( 'wp_sitemaps_post_types', function ( $post_types ) {
+    unset( $post_types['post'] );
+    return $post_types;
+} );
+
+// noindex-Seiten (Impressum, Datenschutz, AGB) aus Seiten-Sitemap entfernen
+add_filter( 'wp_sitemaps_posts_query_args', function ( $args, $post_type ) {
+    if ( 'page' !== $post_type ) {
+        return $args;
+    }
+    $exclude = array_filter( array_map(
+        fn( $slug ) => get_page_by_path( $slug )->ID ?? 0,
+        [ 'impressum', 'datenschutz', 'agb' ]
+    ) );
+    $args['post__not_in'] = array_merge( $args['post__not_in'] ?? [], $exclude );
+    return $args;
+}, 10, 2 );
