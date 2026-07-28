@@ -197,25 +197,32 @@ add_action( 'template_redirect', function () {
    E) SEO / META TAGS / JSON-LD (wp_head, Prio 1)
 ════════════════════════════════════════════════════════════ */
 
-add_action( 'wp_head', function () {
+/**
+ * Slug der aktuell ausgelieferten Seite als Schlüssel für die SEO-Map.
+ * Leerstring, wenn die Anfrage keine gepflegte Seite trifft (404, Suche, …).
+ */
+function physio_anne_seo_slug(): string {
 
     global $post;
 
-    $site_url   = 'https://physio-anne.at';
-    $theme_url  = get_template_directory_uri();
-    $og_image   = $theme_url . '/assets/images/about-col.jpg';
-    $og_img_alt = 'Anne Günthner, Physiotherapeutin in Feldkirch';
-
-    // Slug der aktuellen Seite ermitteln
-    $slug = '';
     if ( is_front_page() ) {
-        $slug = 'front-page';
-    } elseif ( is_page() && $post ) {
-        $slug = $post->post_name;
+        return 'front-page';
     }
+    if ( is_page() && $post ) {
+        return $post->post_name;
+    }
+    return '';
+}
 
-    // Seitenspezifische Meta-Daten
-    $pages = [
+/**
+ * Seitenspezifische SEO-Daten: Title, Description, OG/Twitter, noindex.
+ * Wird von wp_head (Metas) und pre_get_document_title (SERP-Title) genutzt.
+ */
+function physio_anne_seo_pages(): array {
+
+    $site_url = 'https://physio-anne.at';
+
+    return [
         'front-page' => [
             'title'       => 'Physio Anne – Physiotherapie in Feldkirch',
             'description' => 'Ihre Physiotherapeutin in Feldkirch. Anne Günthner bietet individuelle Physiotherapie: Manuelle Therapie, Aktive Übungen, Atemtherapie und Beckenbodentherapie.',
@@ -269,6 +276,31 @@ add_action( 'wp_head', function () {
             'noindex'     => true,
         ],
     ];
+}
+
+/**
+ * SERP-Title aus der SEO-Map statt WordPress-Default (Seitentitel – Site-Title).
+ * Bringt das Ortskeyword ins <title>, wichtigstes On-Page-Signal für lokale Suche.
+ */
+add_filter( 'pre_get_document_title', function ( $title ) {
+
+    $pages = physio_anne_seo_pages();
+    $slug  = physio_anne_seo_slug();
+
+    return $pages[ $slug ]['title'] ?? $title;
+} );
+
+add_action( 'wp_head', function () {
+
+    global $post;
+
+    $theme_url  = get_template_directory_uri();
+    $og_image   = $theme_url . '/assets/images/about-col.jpg';
+    $og_img_alt = 'Anne Günthner, Physiotherapeutin in Feldkirch';
+
+    $site_url = 'https://physio-anne.at';
+    $slug     = physio_anne_seo_slug();
+    $pages    = physio_anne_seo_pages();
 
     $current = $pages[ $slug ] ?? $pages['front-page'];
 
@@ -282,7 +314,9 @@ add_action( 'wp_head', function () {
     $page_url    = esc_url( $current['url'] );
     $og_type     = esc_attr( $current['og_type'] ?? 'website' );
     $tw_desc     = esc_attr( $current['tw_desc'] ?? $current['description'] );
-    $noindex     = ! empty( $current['noindex'] );
+    // Nicht gepflegte Anfragen (404, Suche) fallen auf die Startseiten-Daten zurück –
+    // die dürfen dann nicht indexiert werden, sonst Duplicate-Signal auf die Startseite.
+    $noindex     = ! empty( $current['noindex'] ) || '' === $slug;
 
     echo "\n<!-- Physio Anne SEO -->\n";
 
@@ -638,7 +672,15 @@ add_action( 'template_redirect', function () {
         return;
     }
 
-    $slug   = strtolower( $m[1] );
+    $slug = strtolower( $m[1] );
+
+    // Alt-Slugs, die in WordPress anders heißen (about.html, agbs.html liefen ins 404)
+    $aliases = [
+        'about' => 'ueber-mich',
+        'agbs'  => 'agb',
+    ];
+    $slug = $aliases[ $slug ] ?? $slug;
+
     $target = ( 'index' === $slug ) ? home_url( '/' ) : home_url( '/' . $slug . '/' );
 
     // Nur auf tatsächlich existierende Seiten umleiten

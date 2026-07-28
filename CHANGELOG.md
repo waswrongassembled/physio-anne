@@ -4,6 +4,23 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.15] 28.07.2026 – SEO-Fixes aus Search Console: Alt-URL-Aliase + SERP-Titles
+
+Auslöser: Google Search Console meldete „Not found (404)" für Alt-URLs der statischen Vorgängerseite.
+
+### Behoben
+- **404 bei `about.html` und `agbs.html`** (`functions.php`, Abschnitt F): Der Redirect aus 1.0.14 mappte Alt-URLs nur 1:1 auf gleichnamige Slugs. `about.html` (heute `/ueber-mich/`) und `agbs.html` (heute `/agb/`) fielen deshalb durch den Existenz-Guard und lieferten 404. Neue Alias-Map (`about` → `ueber-mich`, `agbs` → `agb`) leitet beide per 301 korrekt weiter. Ursache: 1.0.14 deckte den Dateibestand von `legacy/v2-html/` ab, die beiden Abweichler stammen aus `legacy/v1-html/`.
+
+### Geändert
+- **SERP-Title aus der SEO-Map** (`functions.php`, Abschnitt E): Die keyword-starken Titles der Map („Leistungen – Physiotherapie Feldkirch | Physio Anne") wurden bisher nur für `og:title`/`twitter:title` ausgegeben; im `<title>` stand der WordPress-Default („Leistungen – Physio Anne"). Neuer `pre_get_document_title`-Filter zieht den Map-Title ins `<title>` – das Ortskeyword steht damit im wichtigsten On-Page-Signal für lokale Suche.
+- **Refactoring** (`functions.php`, Abschnitt E): SEO-Map und Slug-Ermittlung aus der `wp_head`-Closure in `physio_anne_seo_pages()` / `physio_anne_seo_slug()` extrahiert, damit Metas und Title-Filter dieselbe Quelle nutzen.
+- **noindex für nicht gepflegte Anfragen** (`functions.php`, Abschnitt E): 404- und Suchseiten fielen auf die Startseiten-Metadaten zurück und gaben damit ein Canonical auf `/` aus. Diese Fälle liefern jetzt `noindex, nofollow`.
+
+### Hinweis (kein Fehler)
+- „Page with redirect" (3 Seiten) in der Search Console betrifft `http://www.physio-anne.at/`, `https://www.physio-anne.at/`, `http://physio-anne.at/` – alle leiten korrekt per 301 auf `https://physio-anne.at/`. Erwartetes Verhalten einer Domain-Property, keine Aktion nötig. „Validate Fix" kann hier nie grün werden.
+
+---
+
 ## [1.0.14] 19.07.2026 – SEO: 301-Redirects für Alt-URLs + Sitemap-Cleanup
 
 ### Hinzugefügt
