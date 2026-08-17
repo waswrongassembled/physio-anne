@@ -898,12 +898,18 @@ add_filter( 'wp_sitemaps_post_types', function ( $post_types ) {
 
 remove_action( 'wp_head', 'feed_links', 2 );
 remove_action( 'wp_head', 'feed_links_extra', 3 );
-remove_action( 'wp_head', 'wp_oembed_add_discovery_links' );
 remove_action( 'wp_head', 'rest_output_link_wp_head' );
+
+// oEmbed ist in manchen WordPress-Versionen doppelt registriert (Priorität 4
+// und 10). Beide entfernen, sonst bleibt je nach Version eine Variante übrig.
+remove_action( 'wp_head', 'wp_oembed_add_discovery_links', 4 );
+remove_action( 'wp_head', 'wp_oembed_add_discovery_links' );
 
 // Das Theme gibt in Abschnitt C ein vollständiges Favicon-Set aus.
 // wp_site_icon würde ein zweites, konkurrierendes Set daneben stellen.
-remove_action( 'wp_head', 'wp_site_icon' );
+// Priorität 99 ist zwingend: WordPress registriert die Funktion mit dieser
+// Priorität, und remove_action entfernt nur bei exakter Übereinstimmung.
+remove_action( 'wp_head', 'wp_site_icon', 99 );
 
 // Feed-Aufrufe auf die Startseite umleiten statt leere XML-Dateien auszuliefern
 add_action( 'template_redirect', function () {

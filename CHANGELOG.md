@@ -4,6 +4,16 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.21] 17.08.2026 – Doppeltes Favicon-Set: remove_action braucht die richtige Priorität
+
+### Behoben
+- **Zweites Favicon-Set stand weiter im `<head>`** (`functions.php`, Abschnitt H): Das `remove_action( 'wp_head', 'wp_site_icon' )` aus 1.0.18 war wirkungslos. WordPress registriert die Funktion mit Priorität 99, und `remove_action` entfernt nur bei exakter Übereinstimmung von Callback **und** Priorität – ohne Angabe gilt der Standardwert 10. Live standen deshalb acht Icon-Links im `<head>`: vier aus dem Theme, drei aus `wp-content/uploads/` und das Manifest. Jetzt mit Priorität 99 entfernt.
+- **oEmbed-Absicherung** (`functions.php`, Abschnitt H): `wp_oembed_add_discovery_links` ist je nach WordPress-Version mit Priorität 4 *und* 10 registriert. Beide werden entfernt, damit nach einem WordPress-Update nicht wieder eine Variante durchkommt.
+
+Die übrigen `remove_action`-Aufrufe wurden gegen `wp-includes/default-filters.php` geprüft und stimmen (`feed_links` 2, `feed_links_extra` 3, `print_emoji_detection_script` 7, `rel_canonical` und `rest_output_link_wp_head` jeweils 10). `wlwmanifest_link` existiert seit WordPress 6.3 nicht mehr – der Aufruf bleibt als harmlose Leeroperation stehen.
+
+---
+
 ## [1.0.20] 17.08.2026 – Karten-Einwilligung greift wirklich, Rewrite-Regeln heilen selbst
 
 Beides sind Nachbesserungen an 1.0.18/1.0.19: Die Live-Prüfung nach dem Upload zeigte, dass zwei Änderungen nicht angekommen waren.
