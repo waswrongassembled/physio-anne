@@ -75,6 +75,36 @@ zip -r physio-anne-theme-vX.Y.Z.zip physio-anne-theme/ -x "*.DS_Store"
 
 ---
 
+## robots.txt
+
+Die robots.txt wird vom Theme erzeugt (`functions.php`, Abschnitt J) und ist
+damit versioniert. Haltung: **Zitieren ja, Trainieren nein.** Antwort- und
+Suchcrawler der KI-Anbieter (`OAI-SearchBot`, `Claude-SearchBot`,
+`PerplexityBot`, `ChatGPT-User`, `Claude-User`, `Google-Extended`) sind
+erlaubt, reine Trainingscrawler (`GPTBot`, `ClaudeBot`, `CCBot`, `Bytespider`,
+`meta-externalagent`, `Applebot-Extended`, `Amazonbot`) bleiben gesperrt.
+
+**Cloudflare muss dafür mitspielen.** Cloudflare stellt seinen eigenen Block
+*vor* die vom Theme erzeugte Datei; die dortige Sperre gewinnt, weil Crawler
+die erste passende User-agent-Gruppe auswerten. Solange sie aktiv ist, laufen
+die Freigaben hier ins Leere.
+
+Abschalten unter: **Cloudflare Dashboard → physio-anne.at → AI Crawl Control**
+(früher „AI Audit"). Dort die Blockierregel für AI-Crawler deaktivieren und,
+falls aktiv, „Manage robots.txt" ausschalten. Danach prüfen:
+
+```sh
+curl -s https://physio-anne.at/robots.txt | head -5
+# erste Zeile muss der Kommentar aus functions.php sein,
+# nicht Cloudflares Content-Signal-Präambel
+```
+
+Google-Extended steuert nur Gemini und Grounding – **nicht** die normale
+Google-Suche und **nicht** die AI Overviews, die aus dem regulären Suchindex
+kommen. Eine Sperre dort kostet also keine klassischen Rankings.
+
+---
+
 ## Kontakt / Auftraggeber
 
 **Kunde:** Anne Günthner, Physiotherapeutin  

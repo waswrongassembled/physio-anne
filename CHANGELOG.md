@@ -4,6 +4,17 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.19] 17.08.2026 – robots.txt aus dem Theme: Zitieren erlaubt, Trainieren nicht
+
+### Neu
+- **robots.txt wird vom Theme erzeugt** (`functions.php`, Abschnitt J): Bisher lieferte WordPress nur den Standardblock, die AI-Crawler-Sperre kam von Cloudflare. Der neue `robots_txt`-Filter schreibt die vollständige Richtlinie – damit ist sie versioniert und nachvollziehbar. Haltung: Antwort- und Suchcrawler (`OAI-SearchBot`, `Claude-SearchBot`, `PerplexityBot`, `ChatGPT-User`, `Claude-User`, `Google-Extended`) dürfen zitieren, reine Trainingscrawler (`GPTBot`, `ClaudeBot`, `CCBot`, `Bytespider`, `meta-externalagent`, `Applebot-Extended`, `Amazonbot`) bleiben gesperrt. Content-Signal entsprechend auf `search=yes, ai-input=yes, ai-train=no`.
+- **`docs/DATENSCHUTZ-TEXTBAUSTEINE.md`**: Fertige Absätze für die Datenschutzerklärung, die den Stand nach 1.0.18 beschreiben – Karte mit Einwilligung statt automatischem Laden, lokal gehostete Schriften.
+
+### Wichtig für die Wirksamkeit
+Cloudflare stellt seinen eigenen Block **vor** die vom Theme erzeugte Datei. Da Crawler die erste passende `User-agent`-Gruppe auswerten, gewinnt die Cloudflare-Sperre. Sie muss im Dashboard unter **AI Crawl Control** deaktiviert werden, sonst laufen die Freigaben ins Leere. Anleitung und Prüfbefehl stehen in `README.md`, Abschnitt „robots.txt".
+
+---
+
 ## [1.0.18] 17.08.2026 – Datenschutz: lokale Schriften & Karte mit Einwilligung, Schema-Ausbau
 
 Umsetzung der offenen Punkte aus dem SEO-Audit.

@@ -917,3 +917,95 @@ add_action( 'template_redirect', function () {
 TXT;
     exit;
 } );
+
+/* ════════════════════════════════════════════════════════════
+   J) ROBOTS.TXT
+
+   Haltung: Die Praxis soll in KI-Antworten als Quelle auftauchen dürfen,
+   ihre Inhalte aber nicht als Trainingsmaterial hergeben. Beides lässt sich
+   trennen, weil die Anbieter getrennte Crawler betreiben:
+
+   - Antwort-/Suchcrawler holen Inhalte, um sie in einer Antwort zu zitieren
+     und zu verlinken (OAI-SearchBot, Claude-SearchBot, PerplexityBot) oder
+     weil ein Mensch gerade danach gefragt hat (ChatGPT-User, Claude-User).
+     Diese sind erlaubt – ohne sie ist die Praxis in ChatGPT, Claude und
+     Perplexity schlicht nicht auffindbar.
+   - Trainingscrawler sammeln für das Modelltraining (GPTBot, ClaudeBot,
+     CCBot, Bytespider, meta-externalagent, Applebot-Extended). Diese
+     bleiben gesperrt.
+
+   Google-Extended steuert die Nutzung in Gemini und beim Grounding. Es hat
+   KEINEN Einfluss auf die normale Google-Suche und auch nicht auf die
+   AI Overviews – die kommen aus dem regulären Suchindex.
+
+   WICHTIG: Cloudflare stellt seinen eigenen Block vor diese Datei. Solange
+   die AI-Bot-Sperre dort aktiv ist, greifen die Freigaben hier nicht.
+   Siehe README, Abschnitt "robots.txt".
+════════════════════════════════════════════════════════════ */
+
+add_filter( 'robots_txt', function ( $output, $public ) {
+
+    // Auf einer als nicht öffentlich markierten Installation nichts überschreiben
+    if ( ! $public ) {
+        return $output;
+    }
+
+    $sitemap = esc_url_raw( home_url( '/wp-sitemap.xml' ) );
+
+    return <<<TXT
+# Suche und KI-Antworten sind erwünscht, Modelltraining nicht.
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+
+User-agent: *
+Allow: /
+Disallow: /wp-admin/
+Allow: /wp-admin/admin-ajax.php
+
+# ── Antwort- und Suchcrawler: erlaubt ──────────────────────
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# ── Trainingscrawler: gesperrt ─────────────────────────────
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+Sitemap: {$sitemap}
+
+TXT;
+}, 10, 2 );
