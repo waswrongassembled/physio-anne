@@ -89,3 +89,52 @@ Datum der letzten Aktualisierung am Ende der Datenschutzerklärung anpassen.
 Die Seite trägt seit 1.0.18 ein `dateModified` im strukturierten Datenblock,
 das aus dem WordPress-Änderungsdatum kommt – das aktualisiert sich beim
 Speichern von selbst.
+
+---
+
+## Status: umgesetzt am 17.08.2026
+
+Alle Bausteine sind live. Die Seite (ID 3) wurde über die WordPress-REST-API
+aktualisiert, die Struktur sieht jetzt so aus:
+
+```
+3. Hosting und Auslieferung der Website
+     Hetzner (Server und E-Mail)
+     Cloudflare (Auslieferung und Absicherung)
+5. Datenerfassung auf dieser Website
+     Kontaktformular          ← Empfänger, keine DB-Speicherung, Speicherdauer
+     Anfragen per E-Mail oder Telefon
+     Cookies                  ← neu
+     Server-Log-Dateien
+6. Karten (OpenStreetMap / Leaflet)   ← Einwilligung statt Auto-Load
+8. Schriftarten                        ← neu
+```
+
+Ergänzt gegenüber dem vorherigen Stand:
+
+- **Hosting** war namenlos („bei einem Hosting-Anbieter"). Jetzt Hetzner Online
+  GmbH mit Adresse, plus Cloudflare als Proxy – inklusive USA-Übermittlung,
+  EU-U.S. Data Privacy Framework, Standardvertragsklauseln und Art. 28 DSGVO.
+- **Kontaktformular**: Zustellung ausschließlich per E-Mail an ein
+  Hetzner-Postfach, keine Speicherung in der Website-Datenbank, keine
+  Spamschutzdienste Dritter, Speicherdauer benannt.
+- **Cookies**: neuer Abschnitt. Die Seite setzt technisch nachweisbar keine
+  Cookies (kein `Set-Cookie` auf Start- und Kontaktseite, kein reCAPTCHA, kein
+  Akismet, Contact Form 7 ohne Cookies). Ein Banner ist damit nicht nötig.
+- **Stand-Datum** am Seitenende.
+
+### Zwei Punkte zum Nachprüfen
+
+1. **Serverstandort.** Formuliert als „innerhalb der Europäischen Union", weil
+   der Origin hinter Cloudflare nicht ermittelbar ist. Läuft die Website in
+   einem Hetzner-Rechenzentrum in Deutschland, kann das präzisiert werden;
+   liegt sie in Helsinki, ist die jetzige Formulierung korrekt.
+2. **Auftragsverarbeitungsverträge.** Die Erklärung nennt sie für Hetzner und
+   Cloudflare. Bei beiden ist der AVV standardmäßig Bestandteil der
+   Vertragsbedingungen – einmal bestätigen, damit die Aussage trägt.
+
+### Offen: juristische Prüfung
+
+Der Text beschreibt den technischen Stand präzise. Ob die Erklärung insgesamt
+vollständig ist, bleibt eine Rechtsfrage – bei einer Gesundheitsdienstleisterin
+mit Behandlungsdokumentation gehört sie einmal gegengelesen.
