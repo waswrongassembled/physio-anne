@@ -4,6 +4,27 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.17] 17.08.2026 – WebP-Auslieferung, Canonical-Bereinigung, de-AT
+
+Aus dem SEO-Audit nach 1.0.16. Kernbefund: Die Startseite lieferte rund 17 MB Bilder aus.
+
+### Behoben
+- **PNG statt WebP im Seiteninhalt** (`functions.php`, Abschnitt C2): Die Hero-Slides wurden als PNG ausgeliefert – 5,1 MB + 7,4 MB + 3,5 MB – obwohl die WebP-Varianten (66 KB / 76 KB / 52 KB) im Theme liegen. Ursache: Die Templates nutzen `wp:post-content`, der Seiteninhalt liegt also in der Datenbank und stammt aus einem älteren Pattern-Stand ohne `<picture>`-Markup; spätere Verbesserungen an `patterns/hero-start.php` erreichten die Live-Seiten nie. Neuer `the_content`-Filter schreibt Theme-Bildpfade auf die WebP-Variante um, sofern die Datei existiert. Idempotent, `logo.png` (kein WebP-Pendant) bleibt unangetastet. Bildlast der Startseite: ~17 MB → ~1 MB.
+- **Doppeltes rel=canonical** (`functions.php`, Abschnitt B): WordPress' `rel_canonical` und das Theme-eigene Canonical standen beide im `<head>`. WordPress-Variante per `remove_action` entfernt.
+- **Canonical auf Fehlerseiten** (`functions.php`, Abschnitt E): 404- und Suchseiten fielen auf die Startseiten-Metadaten zurück und gaben `rel=canonical` auf `/` aus – erklärte die Fehlerseite zum Duplikat der Startseite. Canonical wird jetzt nur noch für gepflegte Seiten ausgegeben.
+
+### Geändert
+- **`noindex, follow` statt `noindex, nofollow`** (`functions.php`, Abschnitt E): Betrifft nur noch 404- und Suchseiten. `follow` lässt den Crawler den Navigationslinks folgen, statt den Pfad zu kappen.
+- **`lang="de-AT"` statt `lang="de"`** (`functions.php`, Abschnitt B): Deckungsgleich mit `inLanguage: de-AT` im JSON-LD, signalisiert Google die österreichische Zielregion.
+
+### Offen (nicht in dieser Version)
+- Telefonnummer inkonsistent: Anzeigetext `+43 660 77 44 162` (12 Stellen) vs. `tel:`-Link und JSON-LD `+43660774162` (11 Stellen). Eine der beiden ist falsch – Klärung mit Anne nötig, dann NAP überall angleichen.
+- `sameAs` im JSON-LD fehlt (Google Business Profile, Instagram, Facebook) – braucht die URLs.
+- Google Fonts werden von `fonts.googleapis.com` geladen; für DSGVO-Konformität lokal hosten.
+- `AggregateRating` mit `ratingCount: 2` ist selbst ausgezeichnet; Google wertet das für LocalBusiness nicht als Rich Result.
+
+---
+
 ## [1.0.16] 17.08.2026 – Rechtsseiten indexierbar: noindex von Impressum, Datenschutz und AGB entfernt
 
 Auslöser: Google Search Console meldete „Excluded by ‚noindex' tag". Ursache war nicht die WordPress-Einstellung „Suchmaschinen davon abhalten, diese Website zu indexieren", sondern das Theme selbst.

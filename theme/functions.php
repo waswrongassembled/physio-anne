@@ -137,8 +137,18 @@ remove_action( 'wp_print_styles', 'print_emoji_styles' );
 remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
 remove_action( 'admin_print_styles', 'print_emoji_styles' );
 
+// WordPress-eigenes Canonical entfernen – Abschnitt E setzt ein eigenes.
+// Sonst stehen zwei rel=canonical im <head>.
+remove_action( 'wp_head', 'rel_canonical' );
+
 // Titel-Trennzeichen
 add_filter( 'document_title_separator', fn() => '–' );
+
+// Sprachcode inkl. Region: passt zu inLanguage "de-AT" im JSON-LD und
+// signalisiert Google die österreichische Zielregion.
+add_filter( 'language_attributes', function ( $output ) {
+    return preg_replace( '/lang="de(-[A-Za-z]+)?"/', 'lang="de-AT"', $output );
+} );
 
 /* ════════════════════════════════════════════════════════════
    C) FAVICONS & APP ICONS (wp_head, Prio 2)
@@ -322,12 +332,15 @@ add_action( 'wp_head', function () {
     // Meta Description
     echo '<meta name="description" content="' . $description . '">' . "\n";
 
-    // Canonical
-    echo '<link rel="canonical" href="' . $page_url . '">' . "\n";
+    // Canonical – nur für gepflegte Seiten. Auf 404/Suche zeigte der Fallback
+    // sonst auf die Startseite und erklärte die Fehlerseite zu deren Duplikat.
+    if ( ! $noindex ) {
+        echo '<link rel="canonical" href="' . $page_url . '">' . "\n";
+    }
 
-    // noindex für legale Seiten
+    // noindex für nicht gepflegte Anfragen (404, Suche)
     if ( $noindex ) {
-        echo '<meta name="robots" content="noindex, nofollow">' . "\n";
+        echo '<meta name="robots" content="noindex, follow">' . "\n";
     }
 
     // Open Graph
@@ -631,6 +644,36 @@ function physio_anne_get_jsonld( string $slug, string $site_url, string $theme_u
 
     return "\n<script type=\"application/ld+json\">\n" . $jsonld . "\n</script>\n";
 }
+
+/* ════════════════════════════════════════════════════════════
+   C2) BILDAUSLIEFERUNG – WebP statt PNG/JPG im Seiteninhalt
+
+   Der Seiteninhalt der Seiten liegt in der Datenbank (Templates nutzen
+   wp:post-content). Er stammt aus einem älteren Pattern-Stand ohne
+   <picture>-Markup und referenziert deshalb die PNG-Originale: die drei
+   Hero-Slides allein sind zusammen rund 16 MB, die WebP-Varianten
+   derselben Bilder rund 200 KB.
+
+   Bis der DB-Inhalt neu aus den Patterns eingesetzt ist, werden die Pfade
+   beim Ausliefern auf die WebP-Variante umgeschrieben – aber nur, wenn die
+   Datei im Theme existiert. Idempotent: bereits vorhandene .webp-Pfade und
+   Bilder ohne WebP-Pendant (z.B. logo.png) bleiben unangetastet.
+════════════════════════════════════════════════════════════ */
+
+add_filter( 'the_content', function ( $content ) {
+
+    $images_dir = get_template_directory() . '/assets/images/';
+
+    return preg_replace_callback(
+        '#(assets/images/)([\w-]+)\.(png|jpe?g)#i',
+        function ( $m ) use ( $images_dir ) {
+            return file_exists( $images_dir . $m[2] . '.webp' )
+                ? $m[1] . $m[2] . '.webp'
+                : $m[0];
+        },
+        $content
+    );
+}, 20 );
 
 /* ════════════════════════════════════════════════════════════
    D) BLOCK PATTERN KATEGORIE
