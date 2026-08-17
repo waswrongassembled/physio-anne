@@ -257,7 +257,6 @@ function physio_anne_seo_pages(): array {
             'url'         => $site_url . '/impressum/',
             'og_type'     => 'website',
             'tw_desc'     => 'Impressum – Physio Anne Feldkirch',
-            'noindex'     => true,
         ],
         'datenschutz' => [
             'title'       => 'Datenschutzerklärung – Physio Anne',
@@ -265,7 +264,6 @@ function physio_anne_seo_pages(): array {
             'url'         => $site_url . '/datenschutz/',
             'og_type'     => 'website',
             'tw_desc'     => 'Datenschutz – Physio Anne Feldkirch',
-            'noindex'     => true,
         ],
         'agb' => [
             'title'       => 'AGB – Physio Anne',
@@ -273,7 +271,6 @@ function physio_anne_seo_pages(): array {
             'url'         => $site_url . '/agb/',
             'og_type'     => 'website',
             'tw_desc'     => 'AGB – Physio Anne Feldkirch',
-            'noindex'     => true,
         ],
     ];
 }
@@ -317,6 +314,8 @@ add_action( 'wp_head', function () {
     // Nicht gepflegte Anfragen (404, Suche) fallen auf die Startseiten-Daten zurück –
     // die dürfen dann nicht indexiert werden, sonst Duplicate-Signal auf die Startseite.
     $noindex     = ! empty( $current['noindex'] ) || '' === $slug;
+    // Rechtsseiten (Impressum, Datenschutz, AGB) sind bewusst indexierbar:
+    // Impressum liefert Google die NAP-Daten für das lokale Geschäftsprofil.
 
     echo "\n<!-- Physio Anne SEO -->\n";
 
@@ -707,15 +706,5 @@ add_filter( 'wp_sitemaps_post_types', function ( $post_types ) {
     return $post_types;
 } );
 
-// noindex-Seiten (Impressum, Datenschutz, AGB) aus Seiten-Sitemap entfernen
-add_filter( 'wp_sitemaps_posts_query_args', function ( $args, $post_type ) {
-    if ( 'page' !== $post_type ) {
-        return $args;
-    }
-    $exclude = array_filter( array_map(
-        fn( $slug ) => get_page_by_path( $slug )->ID ?? 0,
-        [ 'impressum', 'datenschutz', 'agb' ]
-    ) );
-    $args['post__not_in'] = array_merge( $args['post__not_in'] ?? [], $exclude );
-    return $args;
-}, 10, 2 );
+// Impressum, Datenschutz und AGB gehören seit 1.0.16 in die Sitemap –
+// kein Ausschluss mehr, da die Seiten indexiert werden sollen.

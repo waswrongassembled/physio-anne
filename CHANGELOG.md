@@ -4,6 +4,19 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.16] 17.08.2026 – Rechtsseiten indexierbar: noindex von Impressum, Datenschutz und AGB entfernt
+
+Auslöser: Google Search Console meldete „Excluded by ‚noindex' tag". Ursache war nicht die WordPress-Einstellung „Suchmaschinen davon abhalten, diese Website zu indexieren", sondern das Theme selbst.
+
+### Geändert
+- **noindex für Rechtsseiten entfernt** (`functions.php`, Abschnitt E): `/impressum/`, `/datenschutz/` und `/agb/` gaben `noindex, nofollow` aus. Der Flag `'noindex' => true` ist bei allen drei Einträgen der SEO-Map entfallen. Begründung: Das Impressum liefert Google die NAP-Daten (Name, Adresse, Telefon) und stützt damit das lokale Geschäftsprofil für Feldkirch; die Seiten sind unique, also kein Duplicate-Signal. Zusätzlich blockierte das `nofollow` den Linkfluss der Footer-Navigation zurück auf Leistungen und Kontakt.
+- **Sitemap-Ausschluss entfernt** (`functions.php`, Abschnitt G): Der `wp_sitemaps_posts_query_args`-Filter hatte die drei Seiten aus `wp-sitemap-posts-page-1.xml` genommen. Sitemap enthält damit wieder alle sieben Seiten statt vier.
+
+### Unverändert
+- 404- und Suchseiten liefern weiterhin `noindex, nofollow` (Fallback auf Startseiten-Metadaten, siehe 1.0.15).
+
+---
+
 ## [1.0.15] 28.07.2026 – SEO-Fixes aus Search Console: Alt-URL-Aliase + SERP-Titles
 
 Auslöser: Google Search Console meldete „Not found (404)" für Alt-URLs der statischen Vorgängerseite.
