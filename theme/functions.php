@@ -104,6 +104,13 @@ add_action( 'wp_enqueue_scripts', function () {
             '1.9.4',
             true
         );
+        wp_enqueue_script(
+            'physio-anne-map',
+            get_template_directory_uri() . '/assets/js/map.js',
+            [ 'leaflet-js' ],
+            filemtime( get_template_directory() . '/assets/js/map.js' ),
+            true
+        );
     }
 } );
 
@@ -741,6 +748,71 @@ add_filter( 'the_content', function ( $content ) {
     return str_replace( 'tel:+43660774162', 'tel:+436607744162', $content );
 }, 20 );
 
+/**
+ * Koordinaten der Praxis – exakt wie im Google Business Profile.
+ * Eine Quelle für JSON-LD, Karte und Overlay.
+ */
+const PHYSIO_ANNE_LAT = 47.2597903;
+const PHYSIO_ANNE_LNG = 9.6068958;
+
+/**
+ * Einwilligungs-Overlay für die Standortkarte.
+ * Wird sowohl vom Pattern als auch vom the_content-Filter genutzt, damit der
+ * Text nur an einer Stelle steht.
+ */
+function physio_anne_map_consent_html(): string {
+
+    $osm = sprintf(
+        'https://www.openstreetmap.org/?mlat=%1$s&mlon=%2$s#map=17/%1$s/%2$s',
+        PHYSIO_ANNE_LAT,
+        PHYSIO_ANNE_LNG
+    );
+
+    return sprintf(
+        '<div id="map-consent" class="map-consent" data-lat="%s" data-lng="%s">'
+        . '<p class="map-consent-text">Die Karte wird von OpenStreetMap geladen.'
+        . ' Dabei wird Ihre IP-Adresse an OpenStreetMap übertragen.</p>'
+        . '<button type="button" id="map-consent-btn" class="btn btn-primary">Karte laden</button>'
+        . '<p class="map-consent-alt"><a href="%s" target="_blank" rel="noopener noreferrer">'
+        . 'Stattdessen bei OpenStreetMap öffnen</a></p>'
+        . '</div>',
+        esc_attr( PHYSIO_ANNE_LAT ),
+        esc_attr( PHYSIO_ANNE_LNG ),
+        esc_url( $osm )
+    );
+}
+
+/* ── Karte im Datenbank-Inhalt nachrüsten ─────────────────────
+   Der Inhalt der Kontaktseite stammt aus einem älteren Pattern-Stand: Er
+   enthält den Kartencontainer plus eine Inline-Initialisierung, die die
+   Kacheln beim Seitenaufruf lädt – also ohne Einwilligung. Der Filter
+   entfernt diese Initialisierung und setzt das Overlay davor. Greift nur,
+   wenn das Overlay nicht schon im Inhalt steht. */
+
+add_filter( 'the_content', function ( $content ) {
+
+    if ( false === strpos( $content, 'id="map"' ) || false !== strpos( $content, 'map-consent' ) ) {
+        return $content;
+    }
+
+    // Alte Inline-Initialisierung entfernen; die Logik liegt in assets/js/map.js.
+    $content = preg_replace_callback(
+        '#<script\b[^>]*>[\s\S]*?</script>#i',
+        fn( $m ) => false !== strpos( $m[0], 'L.map(' ) ? '' : $m[0],
+        $content
+    );
+
+    // Overlay direkt hinter den Kartencontainer setzen.
+    // Callback statt Ersetzungsstring, damit $ und \ im HTML nicht als
+    // Rückverweise gedeutet werden.
+    return preg_replace_callback(
+        '#<div\s+id="map"[^>]*>\s*</div>#i',
+        fn( $m ) => $m[0] . physio_anne_map_consent_html(),
+        $content,
+        1
+    );
+}, 21 );
+
 /* ════════════════════════════════════════════════════════════
    D) BLOCK PATTERN KATEGORIE
 ════════════════════════════════════════════════════════════ */
@@ -853,6 +925,21 @@ add_action( 'template_redirect', function () {
 add_action( 'init', function () {
     add_rewrite_rule( '^llms\.txt$', 'index.php?physio_llms=1', 'top' );
 } );
+
+/* Rewrite-Regeln nach einem Theme-Update einmalig neu schreiben.
+   add_rewrite_rule() meldet die Regel nur an; in der Datenbank landet sie
+   erst durch einen Flush. Ohne das liefert eine neu hinzugefügte Route nach
+   dem Upload einen 404, bis jemand die Permalinks speichert – genau das war
+   bei /llms.txt in 1.0.19 der Fall. Der Versionsvergleich erledigt das
+   künftig von selbst. Soft-Flush: die .htaccess bleibt unberührt. */
+add_action( 'init', function () {
+    $current = wp_get_theme()->get( 'Version' );
+
+    if ( get_option( 'physio_anne_rewrite_version' ) !== $current ) {
+        flush_rewrite_rules( false );
+        update_option( 'physio_anne_rewrite_version', $current );
+    }
+}, 99 );
 
 add_filter( 'query_vars', function ( $vars ) {
     $vars[] = 'physio_llms';

@@ -4,6 +4,19 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.20] 17.08.2026 – Karten-Einwilligung greift wirklich, Rewrite-Regeln heilen selbst
+
+Beides sind Nachbesserungen an 1.0.18/1.0.19: Die Live-Prüfung nach dem Upload zeigte, dass zwei Änderungen nicht angekommen waren.
+
+### Behoben
+- **Karte lud weiterhin ungefragt** (`functions.php` Abschnitt C2, `assets/js/map.js`, `patterns/contact-full.php`): Die Einwilligungslösung aus 1.0.18 lag nur im Pattern – der Inhalt der Kontaktseite kommt aber aus der Datenbank und enthielt unverändert den Kartencontainer samt Inline-Initialisierung, die die Kacheln beim Seitenaufruf lud. Die DSGVO-Wirkung war damit null. Der `the_content`-Filter entfernt jetzt die alte Initialisierung und setzt das Overlay davor. Die Kartenlogik liegt neu in `assets/js/map.js`; das Overlay-Markup erzeugt `physio_anne_map_consent_html()`, die Pattern und Filter gemeinsam nutzen. Koordinaten stehen als Konstanten `PHYSIO_ANNE_LAT` / `PHYSIO_ANNE_LNG` nur noch an einer Stelle.
+- **`/llms.txt` lieferte 404** (`functions.php`, Abschnitt I): `add_rewrite_rule()` meldet eine Route nur an; in der Datenbank landet sie erst durch einen Flush. Nach dem Upload von 1.0.19 fehlte der, die Route war also toter Code. Neu: Ein Versionsvergleich löst nach jedem Theme-Update einmalig einen Soft-Flush aus (`.htaccess` bleibt unberührt). Damit heilt sich das künftig selbst.
+
+### Hinweis
+`/site.webmanifest` war nie defekt – der 301 in der Prüfung war nur die Ergänzung des Schrägstrichs; die Route liefert 200 mit `application/manifest+json`.
+
+---
+
 ## [1.0.19] 17.08.2026 – robots.txt aus dem Theme: Zitieren erlaubt, Trainieren nicht
 
 ### Neu
