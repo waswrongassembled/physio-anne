@@ -35,7 +35,7 @@
     </div>
     <div class="cta-banner-btns">
       <a href="/kontakt/" class="btn btn-accent">Termin anfragen</a>
-      <a href="tel:+43660774162" class="btn btn-outline-white">+43 660 77 44 162</a>
+      <a href="tel:+436607744162" class="btn btn-outline-white">+43 660 77 44 162</a>
     </div>
   </div>
 </section>

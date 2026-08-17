@@ -57,12 +57,12 @@ add_action( 'after_setup_theme', function () {
 
 add_action( 'wp_enqueue_scripts', function () {
 
-    // Google Fonts
+    // Schriften – lokal gehostet (kein Verbindungsaufbau zu Google, DSGVO)
     wp_enqueue_style(
         'physio-anne-fonts',
-        'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap',
+        get_template_directory_uri() . '/assets/css/fonts.css',
         [],
-        null
+        filemtime( get_template_directory() . '/assets/css/fonts.css' )
     );
 
     // Haupt-CSS
@@ -87,17 +87,19 @@ add_action( 'wp_enqueue_scripts', function () {
         'themeUrl' => get_template_directory_uri(),
     ] );
 
-    // Leaflet – nur auf Kontakt-Seite laden
+    // Leaflet – lokal gehostet, nur auf der Kontakt-Seite.
+    // Das Skript lädt von sich aus keine Kacheln; die Karte wird erst nach
+    // Klick initialisiert (siehe patterns/contact-full.php).
     if ( is_page( 'kontakt' ) ) {
         wp_enqueue_style(
             'leaflet-css',
-            'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+            get_template_directory_uri() . '/assets/vendor/leaflet/leaflet.css',
             [],
             '1.9.4'
         );
         wp_enqueue_script(
             'leaflet-js',
-            'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+            get_template_directory_uri() . '/assets/vendor/leaflet/leaflet.js',
             [],
             '1.9.4',
             true
@@ -105,10 +107,13 @@ add_action( 'wp_enqueue_scripts', function () {
     }
 } );
 
-// Preconnect für Google Fonts
+// Preload der Schriften, die above the fold gebraucht werden.
+// Ersetzt den früheren Preconnect zu Google – die Dateien liegen jetzt lokal.
 add_action( 'wp_head', function () {
-    echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
-    echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+    $t = get_template_directory_uri() . '/assets/fonts/';
+    foreach ( [ 'cormorant-garamond-600-latin.woff2', 'dm-sans-400-latin.woff2' ] as $font ) {
+        echo '<link rel="preload" as="font" type="font/woff2" crossorigin href="' . esc_url( $t . $font ) . '">' . "\n";
+    }
 }, 1 );
 
 // Block-Editor JS + CSS auf Frontend dequeuen
@@ -386,7 +391,7 @@ function physio_anne_get_jsonld( string $slug, string $site_url, string $theme_u
         'url'             => $site_url,
         'logo'            => $theme_url . '/assets/images/logo.png',
         'image'           => $theme_url . '/assets/images/about-col.jpg',
-        'telephone'       => '+43660774162',
+        'telephone'       => '+436607744162',
         'email'           => 'info@physio-anne.at',
         'address'         => [
             '@type'           => 'PostalAddress',
@@ -396,10 +401,17 @@ function physio_anne_get_jsonld( string $slug, string $site_url, string $theme_u
             'addressRegion'   => 'Vorarlberg',
             'addressCountry'  => 'AT',
         ],
+        // Koordinaten exakt wie im Google Business Profile hinterlegt –
+        // Abweichungen schwächen den Abgleich der Einträge.
         'geo'             => [
             '@type'     => 'GeoCoordinates',
-            'latitude'  => 47.259972,
-            'longitude' => 9.606842,
+            'latitude'  => 47.2597903,
+            'longitude' => 9.6068958,
+        ],
+        // Verknüpft die Website mit dem Google Business Profile. Erst dadurch
+        // erkennen Google und LLMs Website und Eintrag als dieselbe Praxis.
+        'sameAs'          => [
+            'https://maps.google.com/?cid=14752575632081097472',
         ],
         'openingHoursSpecification' => [
             [ '@type' => 'OpeningHoursSpecification', 'dayOfWeek' => 'Monday',    'opens' => '12:00', 'closes' => '13:30' ],
@@ -421,11 +433,48 @@ function physio_anne_get_jsonld( string $slug, string $site_url, string $theme_u
         ],
         'contactPoint'    => [
             '@type'       => 'ContactPoint',
-            'telephone'   => '+43660774162',
+            'telephone'   => '+436607744162',
             'contactType' => 'appointment scheduling',
         ],
         'founder'         => [ '@id' => $anne_id ],
         'employee'        => [ '@id' => $anne_id ],
+        // Honorare strukturiert. "Was kostet Physiotherapie in Feldkirch" ist
+        // eine der häufigsten lokalen Suchanfragen – als Offer ist die Antwort
+        // maschinenlesbar statt nur Fließtext. Preise USt-befreit gem.
+        // § 6 Abs. 1 Z 19 UStG, siehe patterns/pricing-table*.php.
+        'hasOfferCatalog' => [
+            '@type'           => 'OfferCatalog',
+            'name'            => 'Honorare Physio Anne',
+            'itemListElement' => array_map(
+                fn( $o ) => [
+                    '@type'         => 'Offer',
+                    'name'          => $o[0],
+                    'price'         => $o[1],
+                    'priceCurrency' => 'EUR',
+                    'availability'  => 'https://schema.org/InStock',
+                    'itemOffered'   => [
+                        '@type'    => 'Service',
+                        'name'     => $o[0],
+                        'provider' => [ '@id' => $business_id ],
+                    ],
+                    'eligibleDuration' => [
+                        '@type'    => 'QuantitativeValue',
+                        'value'    => $o[2],
+                        'unitCode' => 'MIN',
+                    ],
+                ],
+                [
+                    [ 'Heilgymnastik 30 Minuten',        '53.00',  30 ],
+                    [ 'Heilgymnastik 45 Minuten',        '80.00',  45 ],
+                    [ 'Heilgymnastik 60 Minuten',        '106.00', 60 ],
+                    [ 'KPE (Lymphdrainage) 30 Minuten',  '53.00',  30 ],
+                    [ 'KPE (Lymphdrainage) 45 Minuten',  '80.00',  45 ],
+                    [ 'KPE (Lymphdrainage) 60 Minuten',  '106.00', 60 ],
+                    [ 'Heilmassage 15 Minuten',          '27.00',  15 ],
+                    [ 'Elektrotherapie 15 Minuten',      '7.50',   15 ],
+                ]
+            ),
+        ],
     ];
 
     // Anne Person-Block
@@ -469,13 +518,11 @@ function physio_anne_get_jsonld( string $slug, string $site_url, string $theme_u
                 'about'    => [ '@id' => $business_id ],
                 'inLanguage' => 'de-AT',
             ];
-            $graph[] = [
-                '@type'      => 'AggregateRating',
-                'itemReviewed' => [ '@id' => $business_id ],
-                'ratingValue' => '5',
-                'bestRating'  => '5',
-                'ratingCount' => '2',
-            ];
+            // Kein AggregateRating: Google wertet selbst ausgezeichnete
+            // Bewertungen für LocalBusiness seit 2024 nicht mehr als Rich
+            // Result und stuft sie als "self-serving" ein. Die echten
+            // Rezensionen wirken über das Google Business Profile, das per
+            // sameAs mit dieser Seite verknüpft ist.
             $graph[] = [
                 '@type'      => 'FAQPage',
                 'mainEntity' => [
@@ -637,6 +684,20 @@ function physio_anne_get_jsonld( string $slug, string $site_url, string $theme_u
         return '';
     }
 
+    // Änderungsdatum an die WebPage-Knoten hängen. Aktualität ist ein
+    // Rankingsignal, und LLMs können die Angaben – vor allem die Preise –
+    // zeitlich einordnen statt sie unbefristet zu zitieren.
+    $current_post = get_post();
+    if ( $current_post ) {
+        $modified = get_post_modified_time( 'c', true, $current_post );
+        foreach ( $graph as &$node ) {
+            if ( 'WebPage' === ( $node['@type'] ?? '' ) ) {
+                $node['dateModified'] = $modified;
+            }
+        }
+        unset( $node );
+    }
+
     $jsonld = json_encode(
         [ '@context' => 'https://schema.org', '@graph' => $graph ],
         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
@@ -646,25 +707,25 @@ function physio_anne_get_jsonld( string $slug, string $site_url, string $theme_u
 }
 
 /* ════════════════════════════════════════════════════════════
-   C2) BILDAUSLIEFERUNG – WebP statt PNG/JPG im Seiteninhalt
+   C2) KORREKTUREN AM AUSGELIEFERTEN SEITENINHALT
 
-   Der Seiteninhalt der Seiten liegt in der Datenbank (Templates nutzen
-   wp:post-content). Er stammt aus einem älteren Pattern-Stand ohne
-   <picture>-Markup und referenziert deshalb die PNG-Originale: die drei
-   Hero-Slides allein sind zusammen rund 16 MB, die WebP-Varianten
-   derselben Bilder rund 200 KB.
-
-   Bis der DB-Inhalt neu aus den Patterns eingesetzt ist, werden die Pfade
-   beim Ausliefern auf die WebP-Variante umgeschrieben – aber nur, wenn die
-   Datei im Theme existiert. Idempotent: bereits vorhandene .webp-Pfade und
-   Bilder ohne WebP-Pendant (z.B. logo.png) bleiben unangetastet.
+   Der Seiteninhalt liegt in der Datenbank (die Templates nutzen
+   wp:post-content) und stammt aus einem älteren Pattern-Stand. Spätere
+   Verbesserungen an den Patterns erreichen die Live-Seiten deshalb nicht,
+   solange der Inhalt nicht neu eingesetzt wird. Bis dahin werden zwei Dinge
+   beim Ausliefern korrigiert. Beide Filter sind idempotent und stören auch
+   dann nicht, wenn der DB-Inhalt später aktualisiert wird.
 ════════════════════════════════════════════════════════════ */
 
 add_filter( 'the_content', function ( $content ) {
 
+    /* 1. WebP statt PNG/JPG.
+       Die drei Hero-Slides gehen als PNG mit zusammen rund 16 MB raus,
+       obwohl die WebP-Varianten derselben Bilder rund 200 KB wiegen.
+       Bilder ohne WebP-Pendant (z.B. logo.png) bleiben unangetastet. */
     $images_dir = get_template_directory() . '/assets/images/';
 
-    return preg_replace_callback(
+    $content = preg_replace_callback(
         '#(assets/images/)([\w-]+)\.(png|jpe?g)#i',
         function ( $m ) use ( $images_dir ) {
             return file_exists( $images_dir . $m[2] . '.webp' )
@@ -673,6 +734,11 @@ add_filter( 'the_content', function ( $content ) {
         },
         $content
     );
+
+    /* 2. Telefonnummer im tel:-Link.
+       Der alte Stand verlinkt +43660774162 – eine Stelle zu wenig, der
+       Anruf geht ins Leere. Korrekt ist +43 660 77 44 162. */
+    return str_replace( 'tel:+43660774162', 'tel:+436607744162', $content );
 }, 20 );
 
 /* ════════════════════════════════════════════════════════════
@@ -751,3 +817,103 @@ add_filter( 'wp_sitemaps_post_types', function ( $post_types ) {
 
 // Impressum, Datenschutz und AGB gehören seit 1.0.16 in die Sitemap –
 // kein Ausschluss mehr, da die Seiten indexiert werden sollen.
+
+/* ════════════════════════════════════════════════════════════
+   H) AUFRÄUMEN – Feeds, oEmbed, doppelte Favicons
+   Die Seite hat keine Beiträge; Feeds und Einbettungs-Endpunkte
+   sind damit toter Ballast im <head> und in der Crawl-Struktur.
+════════════════════════════════════════════════════════════ */
+
+remove_action( 'wp_head', 'feed_links', 2 );
+remove_action( 'wp_head', 'feed_links_extra', 3 );
+remove_action( 'wp_head', 'wp_oembed_add_discovery_links' );
+remove_action( 'wp_head', 'rest_output_link_wp_head' );
+
+// Das Theme gibt in Abschnitt C ein vollständiges Favicon-Set aus.
+// wp_site_icon würde ein zweites, konkurrierendes Set daneben stellen.
+remove_action( 'wp_head', 'wp_site_icon' );
+
+// Feed-Aufrufe auf die Startseite umleiten statt leere XML-Dateien auszuliefern
+add_action( 'template_redirect', function () {
+    if ( ! is_feed() ) {
+        return;
+    }
+    wp_safe_redirect( home_url( '/' ), 301 );
+    exit;
+}, 1 );
+
+/* ════════════════════════════════════════════════════════════
+   I) /llms.txt – Kurzprofil für KI-Assistenten
+
+   Analog zu robots.txt, aber für Sprachmodelle: eine kompakte, faktische
+   Zusammenfassung der Praxis, damit Assistenten korrekt zitieren statt aus
+   dem Seitenlayout zu raten. Bewusst knapp und ohne Werbesprache.
+════════════════════════════════════════════════════════════ */
+
+add_action( 'init', function () {
+    add_rewrite_rule( '^llms\.txt$', 'index.php?physio_llms=1', 'top' );
+} );
+
+add_filter( 'query_vars', function ( $vars ) {
+    $vars[] = 'physio_llms';
+    return $vars;
+} );
+
+add_action( 'template_redirect', function () {
+    if ( ! get_query_var( 'physio_llms' ) ) {
+        return;
+    }
+
+    header( 'Content-Type: text/plain; charset=UTF-8' );
+    echo <<<'TXT'
+# Physio Anne
+
+> Wahlpraxis für Physiotherapie in Feldkirch, Vorarlberg (Österreich).
+> Inhaberin: Anne Günthner, staatlich geprüfte Physiotherapeutin seit 2012,
+> freiberuflich als Wahltherapeutin seit Juni 2024.
+
+## Eckdaten
+
+- Adresse: Grenzweg 10, DLZ-Gebäude 1. OG, 6800 Feldkirch, Österreich
+- Telefon: +43 660 77 44 162
+- E-Mail: info@physio-anne.at
+- Einzugsgebiet: Feldkirch, Rankweil, Götzis, Altenstadt, Vorarlberg
+- Öffnungszeiten: Mo 12:00–13:30, Di 12:00–15:30, Mi 12:00–13:30,
+  Do 08:00–15:30, Fr 08:00–13:30
+
+## Leistungen
+
+- Manuelle Therapie
+- Aktive Übungen
+- Atemtherapie
+- Beckenbodentherapie (Frauen und Männer)
+- KPE / Lymphdrainage
+- Heilmassage
+- Elektrotherapie
+
+## Honorare
+
+- Heilgymnastik: 53 € (30 Min.), 80 € (45 Min.), 106 € (60 Min.)
+- KPE (Lymphdrainage): 53 € (30 Min.), 80 € (45 Min.), 106 € (60 Min.)
+- Heilmassage: 27 € (15 Min.)
+- Elektrotherapie: 7,50 € (15 Min.)
+- Umsatzsteuerbefreit gemäß § 6 Abs. 1 Z 19 UStG.
+
+## Wichtige Hinweise
+
+- Wahltherapeutin: kein Kassenvertrag, Abrechnung direkt mit den
+  Patient:innen. ÖGK, BVAEB und SVS erstatten auf Antrag einen Teil.
+- Eine ärztliche Zuweisung ist für die Behandlung erforderlich und
+  Voraussetzung für die Kostenerstattung.
+- SVS-Versicherte benötigen vor dem ersten Termin eine Bewilligung der SVS.
+
+## Seiten
+
+- Startseite: https://physio-anne.at/
+- Über mich: https://physio-anne.at/ueber-mich/
+- Leistungen und Preise: https://physio-anne.at/leistungen/
+- Kontakt und Terminanfrage: https://physio-anne.at/kontakt/
+
+TXT;
+    exit;
+} );

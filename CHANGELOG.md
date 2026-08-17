@@ -4,6 +4,33 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.18] 17.08.2026 – Datenschutz: lokale Schriften & Karte mit Einwilligung, Schema-Ausbau
+
+Umsetzung der offenen Punkte aus dem SEO-Audit.
+
+### Datenschutz
+- **Google Fonts lokal gehostet** (`assets/fonts/`, `assets/css/fonts.css`, `functions.php`): Cormorant Garamond und DM Sans wurden bei jedem Seitenaufruf von `fonts.googleapis.com` und `fonts.gstatic.com` geladen und dabei die IP-Adresse der Besucher:innen an Google übertragen – ohne Einwilligung und ohne Erwähnung in der Datenschutzerklärung. 16 woff2-Dateien (Subsets latin + latin-ext, SIL Open Font License) liegen jetzt im Theme. Preconnect zu Google entfällt, stattdessen Preload der beiden Above-the-fold-Schnitte.
+- **Leaflet lokal gehostet** (`assets/vendor/leaflet/`): Skript, Stylesheet und Marker-Grafiken kommen nicht mehr von `unpkg.com`.
+- **Karte lädt erst nach Klick** (`patterns/contact-full.php`, `assets/css/style.css`): Die Kacheln von OpenStreetMap wurden beim Seitenaufruf automatisch geladen. Jetzt liegt ein Einwilligungs-Overlay über der Karte; ohne Klick geht keine Anfrage an Dritte raus. Als Alternative ist ein direkter Link zu OpenStreetMap hinterlegt.
+
+### Behoben
+- **Telefonnummer** (`functions.php`, alle Patterns, `parts/footer.html`): Verlinkt war `tel:+43660774162` – eine Stelle zu wenig, Anrufe gingen ins Leere. Dieselbe falsche Nummer stand im JSON-LD als `telephone`. Korrekt ist `+43 660 77 44 162` (`+436607744162`). Der `the_content`-Filter korrigiert die Nummer auch im Datenbank-Inhalt.
+- **Koordinaten** (`functions.php`): `geo` im JSON-LD wich rund 20 Meter vom Google Business Profile ab; jetzt exakt 47.2597903 / 9.6068958.
+
+### Geändert
+- **`sameAs` mit Google Business Profile** (`functions.php`): Verknüpft Website und Brancheneintrag als dieselbe Entität – Grundlage dafür, dass Google und LLMs beide Quellen zusammenführen.
+- **Honorare als `hasOfferCatalog`** (`functions.php`): Acht `Offer`-Knoten mit Preis, Währung und Dauer. "Was kostet Physiotherapie in Feldkirch" ist maschinenlesbar beantwortet statt nur als Fließtext.
+- **`dateModified` an den WebPage-Knoten** (`functions.php`): Aktualitätssignal; LLMs können die Preisangaben zeitlich einordnen.
+- **`AggregateRating` entfernt** (`functions.php`): War mit `ratingCount: 2` selbst ausgezeichnet. Google wertet solche Bewertungen für `LocalBusiness` seit 2024 nicht mehr als Rich Result. Die echten Rezensionen wirken über das Business Profile, das jetzt per `sameAs` verknüpft ist.
+- **`/llms.txt`** (`functions.php`, Abschnitt I): Kompaktes Faktenprofil der Praxis für KI-Assistenten – Adresse, Leistungen, Honorare, Zuweisungs- und Erstattungsregeln.
+- **Aufgeräumt** (`functions.php`, Abschnitt H): Feed- und oEmbed-Links aus dem `<head>` entfernt, Feed-Aufrufe leiten per 301 auf die Startseite (die Seite hat keine Beiträge). `wp_site_icon` entfernt, das ein zweites Favicon-Set neben dem des Themes ausgab.
+
+### Noch offen
+- Die Datenschutzerklärung beschreibt die Karte als automatisch eingebunden. Der Abschnitt gehört an die neue Einwilligungslösung angepasst – der Text liegt in der Datenbank, also im Seiteneditor.
+- AI-Crawler sind in der robots.txt gesperrt (`ClaudeBot`, `GPTBot`, `Google-Extended` u.a.). Solange das so bleibt, kann die Seite in KI-Antworten nicht als Quelle auftauchen. Cloudflare-Einstellung, kein Theme-Thema.
+
+---
+
 ## [1.0.17] 17.08.2026 – WebP-Auslieferung, Canonical-Bereinigung, de-AT
 
 Aus dem SEO-Audit nach 1.0.16. Kernbefund: Die Startseite lieferte rund 17 MB Bilder aus.

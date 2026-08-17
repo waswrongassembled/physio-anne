@@ -944,10 +944,34 @@ p { line-height: 1.75; }
   border: 1px solid var(--border);
   isolation: isolate; /* kapselt Leaflet-z-indices ein, verhindert Überlagerung der Navigation */
 }
+.map-wrap { position: relative; }
 .map-wrap iframe,
 .map-wrap #map { width: 100%; height: 100%; border: none; }
 /* Karte dezent entsättigen – passt zur ruhigen Ästhetik der Seite */
 .leaflet-tile-pane { filter: saturate(0.55) brightness(1.06); }
+
+/* Einwilligung, bevor Kacheln von OpenStreetMap geladen werden */
+.map-consent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: var(--space-md);
+  text-align: center;
+  background: var(--bg-alt);
+}
+.map-consent-text {
+  max-width: 38ch;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.map-consent-alt { margin: 0; font-size: 13px; }
+.map-consent-alt a { color: var(--text-muted); }
 
 /* ────────────────────────────────────────
    LEGAL PAGES (Impressum, Datenschutz, AGBs)

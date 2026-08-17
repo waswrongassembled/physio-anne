@@ -21,7 +21,7 @@
           </div>
           <div class="contact-detail-body">
             <strong>Telefon</strong>
-            <a href="tel:+43660774162">+43 660 77 44 162</a>
+            <a href="tel:+436607744162">+43 660 77 44 162</a>
           </div>
         </div>
 
@@ -58,6 +58,17 @@
 
         <div class="map-wrap" style="margin-top: 32px;">
           <div id="map" aria-label="Standortkarte Physio Anne Feldkirch"></div>
+          <div id="map-consent" class="map-consent">
+            <p class="map-consent-text">
+              Die Karte wird von OpenStreetMap geladen. Dabei wird Ihre IP-Adresse
+              an OpenStreetMap übertragen.
+            </p>
+            <button type="button" id="map-consent-btn" class="btn btn-primary">Karte laden</button>
+            <p class="map-consent-alt">
+              <a href="https://www.openstreetmap.org/?mlat=47.2597903&amp;mlon=9.6068958#map=17/47.2597903/9.6068958"
+                 target="_blank" rel="noopener noreferrer">Stattdessen bei OpenStreetMap öffnen</a>
+            </p>
+          </div>
         </div>
         <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
           Kartendaten © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>-Mitwirkende
@@ -73,7 +84,7 @@
         if ( $cf7 ) {
             echo do_shortcode( '[contact-form-7 id="' . $cf7->ID . '"]' );
         } else {
-            echo '<p style="color:var(--text-muted);font-size:14px;">Kontaktformular wird eingerichtet – bitte rufen Sie uns an: <a href="tel:+43660774162">+43 660 77 44 162</a></p>';
+            echo '<p style="color:var(--text-muted);font-size:14px;">Kontaktformular wird eingerichtet – bitte rufen Sie uns an: <a href="tel:+436607744162">+43 660 77 44 162</a></p>';
         }
         ?>
       </div>
@@ -83,23 +94,37 @@
 </section>
 
 <script>
+/* Die Karte lädt erst nach ausdrücklichem Klick. Vorher geht keine Anfrage
+   an OpenStreetMap – die IP-Adresse der Besucher:innen wird also nicht
+   ungefragt an Dritte übertragen. Leaflet selbst liegt lokal im Theme. */
 document.addEventListener('DOMContentLoaded', function () {
-  if (typeof L === 'undefined' || !document.getElementById('map')) return;
-  var map = L.map('map', { scrollWheelZoom: false }).setView([47.259972, 9.606842], 15);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap',
-    maxZoom: 19
-  }).addTo(map);
-  var icon = L.divIcon({
-    className: '',
-    html: '<div style="width:14px;height:14px;background:#9b6ebe;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>',
-    iconSize: [14, 14],
-    iconAnchor: [7, 7]
+  var btn     = document.getElementById('map-consent-btn');
+  var consent = document.getElementById('map-consent');
+  var el      = document.getElementById('map');
+  if (!btn || !consent || !el) return;
+
+  btn.addEventListener('click', function () {
+    if (typeof L === 'undefined') return;
+    consent.remove();
+    el.classList.add('is-loaded');
+
+    var pos = [47.2597903, 9.6068958];
+    var map = L.map('map', { scrollWheelZoom: false }).setView(pos, 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      maxZoom: 19
+    }).addTo(map);
+    var icon = L.divIcon({
+      className: '',
+      html: '<div style="width:14px;height:14px;background:#9b6ebe;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    });
+    L.marker(pos, { icon: icon })
+      .addTo(map)
+      .bindPopup('<strong>Physio Anne</strong><br>Grenzweg 10<br>6800 Feldkirch')
+      .openPopup();
   });
-  L.marker([47.259972, 9.606842], { icon: icon })
-    .addTo(map)
-    .bindPopup('<strong>Physio Anne</strong><br>Grenzweg 10<br>6800 Feldkirch')
-    .openPopup();
 });
 </script>
 <!-- /wp:html -->
