@@ -4,6 +4,13 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.24] 27.08.2026 – XML-RPC antwortet mit dem richtigen Statuscode
+
+### Behoben
+- **XML-RPC-Sperre lieferte HTTP 200 mit leerem Rumpf** (`functions.php`, Abschnitt L): Bei einer XML-RPC-Anfrage tauscht WordPress den Die-Handler gegen `_xmlrpc_wp_die_handler()`. Der verpackt die Meldung in ein `IXR_Error` und braucht dafür `$wp_xmlrpc_server` – den legt `xmlrpc.php` aber erst nach `init` an. Das `wp_die()` aus 1.0.23 wurde deshalb still verschluckt: der Endpunkt war blockiert, meldete aber 200 statt 403. Statt `wp_die()` jetzt `status_header( 403 )` mit eigener Textantwort.
+
+---
+
 ## [1.0.23] 27.08.2026 – Ferneinlieferung abgeschaltet: Beitrag per E-Mail und XML-RPC
 
 ### Behoben

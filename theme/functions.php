@@ -1214,19 +1214,27 @@ add_filter( 'enable_post_by_email_configuration', '__return_false' );
    lassen (wp.newPost, metaWeblog.newPost). Die Seite nutzt weder die
    WordPress-App noch Jetpack noch einen externen Editor, der Endpunkt ist
    also reine Angriffsfläche. Der Filter allein lässt xmlrpc.php weiter
-   antworten und nur die Anmeldung scheitern; das wp_die() darunter schließt
+   antworten und nur die Anmeldung scheitern; der Block darunter schließt
    den Endpunkt wirklich. Sollte je ein Dienst XML-RPC brauchen: beides
    entfernen. */
 add_filter( 'xmlrpc_enabled', '__return_false' );
 
 add_action( 'init', function () {
-    if ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) {
-        wp_die(
-            'XML-RPC ist auf dieser Website deaktiviert.',
-            'XML-RPC deaktiviert',
-            array( 'response' => 403 )
-        );
+
+    if ( ! defined( 'XMLRPC_REQUEST' ) || ! XMLRPC_REQUEST ) {
+        return;
     }
+
+    /* Bewusst kein wp_die(): bei einer XML-RPC-Anfrage ersetzt WordPress den
+       Die-Handler durch _xmlrpc_wp_die_handler(). Der schreibt die Meldung in
+       ein IXR_Error-Objekt und braucht dafür $wp_xmlrpc_server – den legt
+       xmlrpc.php aber erst nach 'init' an. Die Meldung fällt deshalb unter den
+       Tisch und die Antwort wäre HTTP 200 mit leerem Rumpf: blockiert, aber
+       mit falschem Statuscode. Darum hier direkt antworten. */
+    status_header( 403 );
+    header( 'Content-Type: text/plain; charset=utf-8' );
+    echo 'XML-RPC ist auf dieser Website deaktiviert.';
+    exit;
 } );
 
 /* 3. Zugangsdaten des Postfachs aus der Datenbank räumen.
