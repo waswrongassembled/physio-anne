@@ -952,6 +952,14 @@ add_filter( 'query_vars', function ( $vars ) {
     return $vars;
 } );
 
+/* WordPress hängt über redirect_canonical() an unbekannte Pfade einen Slash
+   an und schickt /llms.txt per 301 auf /llms.txt/. Der Inhalt kommt zwar an,
+   aber ein Client, der Weiterleitungen auf .txt-Ressourcen nicht verfolgt,
+   sieht nur den Redirect. Für diese eine Route abschalten. */
+add_filter( 'redirect_canonical', function ( $redirect_url ) {
+    return get_query_var( 'physio_llms' ) ? false : $redirect_url;
+} );
+
 add_action( 'template_redirect', function () {
     if ( ! get_query_var( 'physio_llms' ) ) {
         return;
@@ -1102,3 +1110,73 @@ Sitemap: {$sitemap}
 
 TXT;
 }, 10, 2 );
+
+/* ════════════════════════════════════════════════════════════
+   K) KOMMENTARE – vollständig abschalten
+
+   Die Praxisseite besteht aus statischen Seiten, es gibt keine Beiträge und
+   keine Diskussion. Die Block-Templates rendern deshalb gar kein
+   Kommentarformular – das allein reicht aber nicht: wp-comments-post.php
+   nimmt POST-Anfragen unabhängig vom Frontend entgegen, und genau darüber
+   tragen Spam-Bots ihre Backlinks ein. Sichtbar wurde das an den
+   Moderations-Mails zum WordPress-Beispielbeitrag „Hallo Welt!".
+
+   Der Riegel muss deshalb serverseitig sitzen: comments_open() auf false
+   bringt wp_handle_comment_submission() dazu, die Einsendung abzulehnen.
+   Die übrigen Filter schließen die Nebenwege (REST, XML-RPC-Pingback) und
+   räumen die Kommentar-Oberfläche im Backend auf.
+════════════════════════════════════════════════════════════ */
+
+// Kommentar- und Trackback-Unterstützung von allen Inhaltstypen nehmen
+add_action( 'init', function () {
+    foreach ( get_post_types() as $type ) {
+        if ( post_type_supports( $type, 'comments' ) ) {
+            remove_post_type_support( $type, 'comments' );
+            remove_post_type_support( $type, 'trackbacks' );
+        }
+    }
+}, 100 );
+
+// Kern-Prüfung: schließt Frontend-Formular UND den direkten POST auf
+// wp-comments-post.php. Priorität 20, damit sie nach möglichen Plugins greift.
+add_filter( 'comments_open', '__return_false', 20, 2 );
+add_filter( 'pings_open',    '__return_false', 20, 2 );
+
+// Bereits in der Datenbank liegende Kommentare nirgends mehr ausgeben
+add_filter( 'comments_array', '__return_empty_array', 20, 2 );
+
+// REST-Route /wp/v2/comments entfernen – zweiter Einlieferungsweg für Bots
+add_filter( 'rest_endpoints', function ( $endpoints ) {
+    unset(
+        $endpoints['/wp/v2/comments'],
+        $endpoints['/wp/v2/comments/(?P<id>[\d]+)']
+    );
+    return $endpoints;
+} );
+
+// XML-RPC-Pingback abschalten – dritter Weg, zugleich ein DDoS-Verstärker
+add_filter( 'xmlrpc_methods', function ( $methods ) {
+    unset( $methods['pingback.ping'], $methods['pingback.extensions.getPingbacks'] );
+    return $methods;
+} );
+
+add_filter( 'wp_headers', function ( $headers ) {
+    unset( $headers['X-Pingback'] );
+    return $headers;
+} );
+
+/* Backend aufräumen. Die URL edit-comments.php bleibt bewusst erreichbar:
+   die Freigabe-/Papierkorb-Links aus den alten Moderations-Mails sollen
+   weiter funktionieren, damit der Altbestand abgeräumt werden kann. */
+add_action( 'admin_menu', function () {
+    remove_menu_page( 'edit-comments.php' );
+}, 999 );
+
+add_action( 'wp_before_admin_bar_render', function () {
+    global $wp_admin_bar;
+    $wp_admin_bar->remove_node( 'comments' );
+} );
+
+add_action( 'wp_dashboard_setup', function () {
+    remove_meta_box( 'dashboard_recent_comments', 'dashboard', 'normal' );
+} );

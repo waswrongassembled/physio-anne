@@ -4,6 +4,17 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.22] 27.08.2026 – Kommentare dicht, /llms.txt ohne Umweg
+
+### Behoben
+- **Kommentar-Spam über `wp-comments-post.php`** (`functions.php`, neuer Abschnitt K): Die Block-Templates rendern kein Kommentarformular, das hielt Bots aber nicht auf – `wp-comments-post.php` nimmt POST-Anfragen unabhängig vom Frontend entgegen. Über den WordPress-Beispielbeitrag „Hallo Welt!" landeten so Backlink-Kommentare in der Moderationswarteschlange. `comments_open` und `pings_open` liefern jetzt fest `false`, womit `wp_handle_comment_submission()` die Einsendung ablehnt. Zusätzlich geschlossen: die REST-Route `/wp/v2/comments`, der XML-RPC-Pingback und der `X-Pingback`-Header. Kommentar-Support ist von allen Inhaltstypen entfernt, das Backend-Menü und das Dashboard-Widget sind ausgeblendet.
+- **`/llms.txt` antwortete mit 301 statt direkt** (`functions.php`, Abschnitt I): `redirect_canonical()` hängte an den Pfad einen Slash an und leitete auf `/llms.txt/` weiter. Der Inhalt kam an, aber Clients, die Weiterleitungen auf `.txt`-Ressourcen nicht verfolgen, sahen nur den Redirect. Der Canonical-Redirect ist für diese Route jetzt abgeschaltet.
+
+### Hinweis
+Die sieben bereits eingegangenen Spam-Kommentare und der Beispielbeitrag „Hallo Welt!" liegen in der Datenbank und müssen einmalig im Backend gelöscht werden. `edit-comments.php` bleibt dafür absichtlich per URL erreichbar.
+
+---
+
 ## [1.0.21] 17.08.2026 – Doppeltes Favicon-Set: remove_action braucht die richtige Priorität
 
 ### Behoben
