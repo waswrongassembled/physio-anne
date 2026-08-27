@@ -1180,3 +1180,123 @@ add_action( 'wp_before_admin_bar_render', function () {
 add_action( 'wp_dashboard_setup', function () {
     remove_meta_box( 'dashboard_recent_comments', 'dashboard', 'normal' );
 } );
+
+/* ════════════════════════════════════════════════════════════
+   L) FERNEINLIEFERUNG ABSCHALTEN – Beitrag per E-Mail, XML-RPC
+
+   Hintergrund: Auf der Installation war WordPress' Kernfunktion
+   „Beitrag per E-Mail" scharf geschaltet. wp-mail.php holt dabei per POP3
+   ein Postfach ab und macht aus jeder Nachricht einen Beitrag – Autor
+   Benutzer 1, Status „ausstehend", Kategorie „Allgemein", Datum aus dem
+   Date-Header der Mail. Eingetragen war nicht das von WordPress geforderte
+   geheime Extra-Konto, sondern das allgemeine Praxis-Postfach, dazu auf
+   Port 110 ohne Transportverschlüsselung. Auf diesem Weg sind 136 Beiträge
+   aus der Praxiskorrespondenz in die Datenbank gelangt, darunter Namen von
+   Patient:innen mit Behandlungsbezug – Gesundheitsdaten nach Art. 9 DSGVO,
+   für die es hier keinen Verarbeitungszweck gibt.
+
+   Die Seite besteht aus statischen Seiten und braucht keine
+   Ferneinlieferung. Beide Wege werden deshalb geschlossen.
+
+   Reichweite: Die Filter hängen an functions.php. Sie überleben
+   WordPress-Updates, aber KEINEN Theme-Wechsel. Dauerhaft wirkt nur das
+   Zurücksetzen der Zugangsdaten in der Datenbank – das erledigt der
+   dritte Block einmalig.
+════════════════════════════════════════════════════════════ */
+
+/* 1. Beitrag per E-Mail.
+   wp-mail.php bricht mit diesem Filter bei 403 ab, bevor es das Postfach
+   kontaktiert. Derselbe Filter entfernt die Sektion „Beitrag per E-Mail"
+   aus Einstellungen → Schreiben, damit sie nicht erneut befüllt wird. */
+add_filter( 'enable_post_by_email_configuration', '__return_false' );
+
+/* 2. XML-RPC – der zweite Weg, auf dem sich von außen Beiträge anlegen
+   lassen (wp.newPost, metaWeblog.newPost). Die Seite nutzt weder die
+   WordPress-App noch Jetpack noch einen externen Editor, der Endpunkt ist
+   also reine Angriffsfläche. Der Filter allein lässt xmlrpc.php weiter
+   antworten und nur die Anmeldung scheitern; das wp_die() darunter schließt
+   den Endpunkt wirklich. Sollte je ein Dienst XML-RPC brauchen: beides
+   entfernen. */
+add_filter( 'xmlrpc_enabled', '__return_false' );
+
+add_action( 'init', function () {
+    if ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) {
+        wp_die(
+            'XML-RPC ist auf dieser Website deaktiviert.',
+            'XML-RPC deaktiviert',
+            array( 'response' => 403 )
+        );
+    }
+} );
+
+/* 3. Zugangsdaten des Postfachs aus der Datenbank räumen.
+   WordPress legt mailserver_pass unverschlüsselt in wp_options ab – wer
+   Datenbank- oder Administratorzugang hat, liest es mit. Server, Login und
+   Port werden vorher ohne Passwort festgehalten, damit nachvollziehbar
+   bleibt, welches Postfach betroffen war; die Meldung darunter zeigt den
+   Befund einmalig im Backend an. */
+add_action( 'admin_init', function () {
+
+    $server = get_option( 'mailserver_url' );
+
+    if ( ! $server || 'mail.example.com' === $server ) {
+        return;
+    }
+
+    update_option( 'physio_anne_pbe_befund', array(
+        'server'   => $server,
+        'login'    => get_option( 'mailserver_login' ),
+        'port'     => get_option( 'mailserver_port' ),
+        'entfernt' => current_time( 'mysql' ),
+    ) );
+
+    update_option( 'mailserver_url',   'mail.example.com' );
+    update_option( 'mailserver_login', 'login@example.com' );
+    update_option( 'mailserver_pass',  'password' );
+    update_option( 'mailserver_port',  110 );
+} );
+
+add_action( 'admin_notices', function () {
+
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    $befund = get_option( 'physio_anne_pbe_befund' );
+
+    if ( ! is_array( $befund ) ) {
+        return;
+    }
+
+    $quittung = wp_nonce_url(
+        add_query_arg( 'physio_pbe_ok', '1' ),
+        'physio_pbe_ok'
+    );
+
+    printf(
+        '<div class="notice notice-warning"><p><strong>%s</strong></p>' .
+        '<p>%s<br><code>%s</code>%s<br><code>%s</code></p>' .
+        '<p>%s</p><p><a href="%s" class="button">%s</a></p></div>',
+        esc_html__( 'Beitrag per E-Mail war aktiv und wurde abgeschaltet.', 'physio-anne' ),
+        esc_html__( 'Konfiguriert war folgendes Postfach – die Zugangsdaten sind aus der Datenbank entfernt:', 'physio-anne' ),
+        esc_html( $befund['server'] . ':' . $befund['port'] ),
+        esc_html__( ' – Login:', 'physio-anne' ),
+        esc_html( $befund['login'] ),
+        esc_html__( 'Das Passwort lag im Klartext in der Datenbank. Bitte im Mailhosting ändern. Die daraus entstandenen Beiträge unter „Beiträge" löschen und den Papierkorb leeren.', 'physio-anne' ),
+        esc_url( $quittung ),
+        esc_html__( 'Erledigt, Hinweis ausblenden', 'physio-anne' )
+    );
+} );
+
+add_action( 'admin_init', function () {
+
+    if ( ! isset( $_GET['physio_pbe_ok'] ) || ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    check_admin_referer( 'physio_pbe_ok' );
+    delete_option( 'physio_anne_pbe_befund' );
+
+    wp_safe_redirect( remove_query_arg( array( 'physio_pbe_ok', '_wpnonce' ) ) );
+    exit;
+}, 5 );

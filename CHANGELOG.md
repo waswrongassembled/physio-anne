@@ -4,6 +4,18 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.23] 27.08.2026 – Ferneinlieferung abgeschaltet: Beitrag per E-Mail und XML-RPC
+
+### Behoben
+- **„Beitrag per E-Mail" war scharf geschaltet** (`functions.php`, neuer Abschnitt L): Unter Einstellungen → Schreiben stand das allgemeine Praxis-Postfach auf Port 110 ohne Transportverschlüsselung – nicht das geheime Extra-Konto, das WordPress dafür verlangt. `wp-mail.php` holte das Postfach per POP3 ab und legte aus jeder Nachricht einen Beitrag an: Autor Benutzer 1, Status „ausstehend", Kategorie „Allgemein", Datum aus dem `Date`-Header. So sind 136 Beiträge aus der Praxiskorrespondenz in die Datenbank gelangt, darunter Patientennamen mit Behandlungsbezug (Art. 9 DSGVO). Der Filter `enable_post_by_email_configuration` bricht `wp-mail.php` jetzt mit 403 ab und blendet die Einstellungssektion aus.
+- **Postfach-Zugangsdaten aus der Datenbank entfernt** (`functions.php`, Abschnitt L): `mailserver_pass` liegt in WordPress unverschlüsselt in `wp_options`. Server, Login und Port werden einmalig ohne Passwort protokolliert, danach werden alle vier Optionen auf die Werkswerte zurückgesetzt. Eine Backend-Meldung nennt den Befund und weist auf den nötigen Passwortwechsel hin; sie lässt sich per Button quittieren.
+- **XML-RPC abgeschaltet** (`functions.php`, Abschnitt L): zweiter Weg, um von außen Beiträge anzulegen (`wp.newPost`, `metaWeblog.newPost`). `xmlrpc_enabled` allein lässt den Endpunkt weiter antworten, deshalb zusätzlich ein `wp_die()` mit 403 auf `XMLRPC_REQUEST`.
+
+### Hinweis
+Der Riegel im Theme überlebt WordPress-Updates, aber keinen Theme-Wechsel. Dauerhaft wirkt das Zurücksetzen der Optionen in der Datenbank. Die 136 Beiträge müssen einmalig gelöscht und der Papierkorb geleert werden.
+
+---
+
 ## [1.0.22] 27.08.2026 – Kommentare dicht, /llms.txt ohne Umweg
 
 ### Behoben
