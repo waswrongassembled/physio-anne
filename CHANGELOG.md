@@ -4,6 +4,22 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.26] 28.08.2026 – Cache-Dauer der Theme-Assets
+
+### Neu
+- **`assets/.htaccess`**: Schriften, Bilder, CSS und JS aus dem Theme bekommen `Cache-Control: public, max-age=31536000, immutable`. Bisher lieferte der Server `max-age=14400` – vier Stunden für Dateien, deren Inhalt sich nie ändert; Lighthouse rechnete 204 KB pro Wiederbesuch. Sicher ist die lange Dauer, weil sich unter derselben URL nichts ändert: Schriften und Bilder wechseln bei einer Änderung den Dateinamen, CSS und JS hängen einen Versionsparameter aus der Dateizeit an. Die Direktiven stehen in `<IfModule mod_headers.c>` – fehlt das Modul, bliebe die Datei sonst nicht wirkungslos, sondern würde die betroffenen Dateien mit HTTP 500 beantworten.
+
+### Hinweis zur Wirksamkeit
+Greift nur, wenn Apache für dieses Verzeichnis `AllowOverride FileInfo` (oder `All`) erlaubt. Prüfbefehl:
+
+```sh
+curl -sI https://physio-anne.at/wp-content/themes/physio-anne-theme/assets/fonts/dm-sans-400-latin.woff2 | grep -i cache-control
+```
+
+Erwartet: `public, max-age=31536000, immutable`. Kommt weiter `max-age=14400`, ist `AllowOverride` zu, und die Regel muss in die Server- oder Cloudflare-Konfiguration.
+
+---
+
 ## [1.0.25] 28.08.2026 – Agentic Browsing, Kontraste, blockierendes CSS
 
 Anlass: Lighthouse 13 auf Mobil. Performance 81, Accessibility 90, Best Practices 100, SEO 100 – und die neue Kategorie **Agentic Browsing bei 33**. Diese Kategorie wertet nur zwei Prüfungen, weil die WebMCP-Gruppe mangels Formular-Tools nicht anwendbar ist; beide schlugen fehl.
