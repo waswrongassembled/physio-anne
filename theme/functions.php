@@ -912,7 +912,12 @@ add_filter( 'the_content', function ( $content ) {
             } elseif ( false !== strpos( $url, 'service-' ) ) {
                 $sizes = '(max-width: 900px) 92vw, 300px';
             } else {
-                $sizes = '(max-width: 900px) 100vw, 50vw';
+                // 92vw statt 100vw: Der Container hat seitliches Polster, das
+                // Bild misst auf einem 412er Display rund 380 px. Bei 100vw
+                // fordert der Browser 412 px an und nimmt deshalb selbst mit
+                // einfacher Pixeldichte die große Fassung – die kleine käme
+                // nie zum Zug.
+                $sizes = '(max-width: 900px) 92vw, 50vw';
             }
 
             return preg_replace(

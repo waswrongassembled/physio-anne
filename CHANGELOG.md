@@ -4,6 +4,22 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.27] 28.08.2026 – Kleine Fassungen für die Porträtbilder
+
+Nachtrag zu 1.0.25/1.0.26. Live gemessen nach 1.0.26: Performance 91, Accessibility 100, Best Practices 100, SEO 100, Agentic Browsing 100. LCP 3,9 → 2,8 s.
+
+### Neu
+- **`about-col-sm.webp` und `anne-sm.webp`** (je 400 × 625, rund 11 KB gegenüber 39–41 KB): Die beiden Porträtbilder hatten als einzige verbliebene Motive keine kleine Fassung. Der Auslieferungsfilter aus 1.0.25 hängt sie jetzt automatisch als `srcset` an.
+- **`logo-120.webp` neu komprimiert**: 8.446 → 6.680 Bytes, gleiche Maße.
+
+### Geändert
+- **`sizes` für Bilder ohne eigene Regel** (`functions.php`, Bildfilter): `92vw` statt `100vw` unterhalb 900 px. Der Container hat seitliches Polster, das Bild misst auf einem 412er Display rund 380 px. Bei `100vw` fordert der Browser 412 px an und nimmt deshalb selbst bei einfacher Pixeldichte die große Fassung – die kleine wäre nie zum Zug gekommen.
+
+### Was das nicht löst
+Lighthouse meldet weiterhin rund 80 KB unter „Improve image delivery", und das wird so bleiben. Die Rechnung dort vergleicht die Pixelbreite der Datei mit der CSS-Breite und lässt die Pixeldichte außen vor: `hero-slide1-sm.webp` ist 245 px breit für eine Darstellung mit 123 CSS-Pixeln – auf einem Retina-Display exakt richtig, für den Audit „zu groß". Diesen Posten auf null zu bringen hieße, überall einfache Pixeldichte auszuliefern; die Bilder wären auf jedem heutigen Telefon sichtbar weich. Bewusst nicht gemacht.
+
+---
+
 ## [1.0.26] 28.08.2026 – Cache-Dauer der Theme-Assets
 
 ### Neu
