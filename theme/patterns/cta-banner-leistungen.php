@@ -9,7 +9,7 @@
 <!-- wp:html -->
 <section class="cta-banner" aria-labelledby="cta-leistungen-heading">
   <div class="container">
-    <p class="eyebrow" style="color:rgba(255,255,255,0.5);">Termin</p>
+    <p class="eyebrow" style="color:rgba(255,255,255,0.6);">Termin</p>
     <h2 id="cta-leistungen-heading">Bereit für Ihren ersten Termin?</h2>
     <p>Ich freue mich auf Sie. Rufen Sie mich an oder schreiben Sie mir – gemeinsam finden wir die richtige Behandlung für Sie.</p>
     <div class="cta-banner-btns">

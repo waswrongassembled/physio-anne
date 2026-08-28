@@ -381,18 +381,28 @@ p { line-height: 1.75; }
   bottom: 28px; left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 10px;
+  gap: 2px;
   z-index: 4;
 }
+/* Der Punkt bleibt optisch 8 px, die Schaltfläche misst 24 px – das ist die
+   Mindestgröße für Tippziele (axe target-size). Sichtbar ist das ::before. */
 .hero-dot {
+  width: 24px; height: 24px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.hero-dot::before {
+  content: "";
   width: 8px; height: 8px;
   border-radius: 50%;
   background: rgba(107, 45, 139, 0.2);
-  border: none;
-  cursor: pointer;
   transition: background var(--transition), transform var(--transition);
 }
-.hero-dot.active {
+.hero-dot.active::before {
   background: var(--primary);
   transform: scale(1.3);
 }
@@ -470,6 +480,7 @@ p { line-height: 1.75; }
   display: flex; align-items: center; justify-content: center;
 }
 .intro-item-icon svg { width: 24px; height: 24px; stroke: var(--primary); fill: none; stroke-width: 1.5; }
+.intro-item h2,
 .intro-item h3 {
   font-family: var(--font-serif);
   font-size: 20px;
@@ -674,7 +685,7 @@ p { line-height: 1.75; }
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.6);
   margin-bottom: 4px;
 }
 .cta-banner .hours-item .time {
@@ -708,6 +719,7 @@ p { line-height: 1.75; }
 .footer-logo { margin-bottom: var(--space-sm); }
 .footer-logo img {
   height: 60px;
+  width: auto;
   filter: var(--logo-filter-dark);
 }
 .footer-tagline {
@@ -738,14 +750,14 @@ p { line-height: 1.75; }
   flex-wrap: wrap;
   gap: 12px;
 }
-.footer-bottom p { font-size: 12px; color: rgba(255,255,255,0.3); }
+.footer-bottom p { font-size: 12px; color: rgba(255,255,255,0.6); }
 .footer-bottom-links { display: flex; gap: 20px; }
 .footer-bottom-links a {
   font-size: 12px;
-  color: rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.6);
   transition: color var(--transition);
 }
-.footer-bottom-links a:hover { color: rgba(255,255,255,0.7); }
+.footer-bottom-links a:hover { color: rgba(255,255,255,0.85); }
 
 /* ────────────────────────────────────────
    PAGE HERO (Unterseiten)

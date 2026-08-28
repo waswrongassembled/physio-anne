@@ -4,6 +4,30 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.25] 28.08.2026 – Agentic Browsing, Kontraste, blockierendes CSS
+
+Anlass: Lighthouse 13 auf Mobil. Performance 81, Accessibility 90, Best Practices 100, SEO 100 – und die neue Kategorie **Agentic Browsing bei 33**. Diese Kategorie wertet nur zwei Prüfungen, weil die WebMCP-Gruppe mangels Formular-Tools nicht anwendbar ist; beide schlugen fehl.
+
+### Behoben – Agentic Browsing
+- **`llms.txt` ohne Markdown-Links** (`functions.php`, Abschnitt I): Die Seitenliste stand als Klartext (`- Startseite: https://…`). Der Audit erwartet echte Markdown-Links und meldete „File does not appear to contain any links". Jetzt `- [Startseite](https://…): Kurzbeschreibung`, dazu ein Abschnitt „Rechtliches" mit Impressum, Datenschutz und AGB.
+- **Slider-Punkte nicht im Accessibility-Baum** (`functions.php`, Abschnitt C2): `<div class="hero-dots" aria-hidden="true">` enthält drei fokussierbare `<button>`. Für Screenreader und KI-Agenten existieren sie damit nicht, per Tabulator sind sie trotzdem erreichbar. Lighthouse zählt das doppelt – als `aria-hidden-focus` in der Accessibility und als schlecht geformten Baum in der neuen Kategorie. Das Pattern war seit Längerem korrigiert, der Datenbankinhalt nicht; der Auslieferungsfilter zieht das jetzt nach.
+
+### Behoben – Accessibility
+- **Farbkontraste unter 4,5:1** (`assets/css/style.css`, `patterns/cta-banner*.php`, `functions.php` Abschnitt C2): Fußzeilentext und die Links auf Impressum/Datenschutz/AGB standen mit `rgba(255,255,255,0.3)` auf `#4a2060` – **2,46:1**. Die Eyebrow-Zeile im CTA-Banner und die Wochentage in den Öffnungszeiten lagen mit `0.5` bei **4,32:1**, knapp unter der Anforderung. Alle drei jetzt auf `0.6` = **5,53:1**. Der Hover-Zustand der Fußzeilenlinks entsprechend von `0.7` auf `0.85`.
+- **Slider-Punkte als Tippziel zu klein** (`assets/css/style.css`): Folgefehler aus der Korrektur oben – solange die Punkte hinter `aria-hidden` lagen, prüfte axe ihre Größe nicht. Sichtbar sind 8 px, gefordert sind 24 px. Die Schaltfläche misst jetzt 24 px, der Punkt wird als `::before` gezeichnet; das Aussehen bleibt gleich.
+- **Übersprungene Überschriftenebene** (`patterns/intro-strip.php`, `functions.php` Abschnitt C2): Im Werte-Streifen folgte `<h4>` direkt auf die `<h1>` des Heros. Jetzt `<h2>`; `style.css` führt `.intro-item h2` mit, die Optik bleibt unverändert.
+
+### Behoben – Performance
+- **Zwei rendernde blockierende Stylesheets** (`functions.php`, neuer Abschnitt A2): `fonts.css` und `style.css` standen als `<link>` im `<head>`. Lighthouse rechnete 1.830 ms dafür, und die LCP-Aufschlüsselung wies 2.173 ms als Element-Render-Delay aus – die Seite wartete also fast ausschließlich auf diese zwei Dateien. Beide werden jetzt inline in den `<head>` geschrieben (rund 45 KB unkomprimiert, gzip etwa 8 KB), die Requests entfallen. Die relativen `url('../fonts/…')` in `fonts.css` werden dabei absolut gemacht, sonst liefen sie gegen die Seiten-URL ins Leere. Ist eine Datei nicht lesbar, greift der alte Weg über `wp_enqueue_style`.
+- **Bilder ohne Maße und immer in voller Größe** (`functions.php`, neuer Filter nach Abschnitt C2): Der Datenbankinhalt liefert `<img>` ohne `width`/`height`; `service-beckenboden.webp` wiegt 140 KB und erscheint auf einer Karte von 380 px Breite. Lighthouse rechnete 599 KB Überschuss. Der Filter trägt die Maße aus der Datei nach und hängt ein `srcset` an, wo eine `-sm`-Fassung daneben liegt. Die `-sm`-Dateien sind die 2x-Fassungen für Mobilgeräte, ihre halbe Pixelbreite ist deshalb die CSS-Breite im `sizes`-Attribut.
+- **Logo als 60-KB-PNG** (`parts/header.html`, `parts/footer.html`, neu `assets/images/logo-120.webp`): Beide Template-Parts luden `logo.png` (300 × 300, 60 KB) für eine Darstellung mit 52 bzw. 60 px Kantenlänge. Der WebP-Filter aus 1.0.18 greift dort nicht, weil er nur auf den Seiteninhalt wirkt. Neu eine 120-px-Fassung mit 8 KB.
+- **Servicekarten ohne `srcset`** (`patterns/services-grid.php`): Die Karten luden die 2048-px-Fassung. Jetzt `-sm` (800 px) mit `sizes`, wie es `services-full.php` und `services-detail.php` schon vormachen.
+
+### Offen (nicht im Theme lösbar)
+- **Cache-Dauer der Schriften**: Die acht WOFF2-Dateien kommen mit vier Stunden `max-age`, obwohl ihr Inhalt sich nie ändert. 204 KB pro Wiederbesuch. Muss serverseitig oder als Cloudflare-Cache-Regel auf ein Jahr `immutable` gesetzt werden.
+
+---
+
 ## [1.0.24] 27.08.2026 – XML-RPC antwortet mit dem richtigen Statuscode
 
 ### Behoben

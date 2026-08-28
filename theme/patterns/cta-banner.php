@@ -9,7 +9,7 @@
 <!-- wp:html -->
 <section class="cta-banner" aria-labelledby="cta-heading">
   <div class="container">
-    <p class="eyebrow" style="color:rgba(255,255,255,0.5);">Terminvereinbarung</p>
+    <p class="eyebrow" style="color:rgba(255,255,255,0.6);">Terminvereinbarung</p>
     <h2 id="cta-heading">Ich freue mich mit<br>Ihnen arbeiten zu dürfen.</h2>
     <div class="hours-grid">
       <div class="hours-item">

@@ -18,7 +18,7 @@
       <article class="service-card">
         <div class="service-card-img">
           <picture>
-            <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-manuelle.webp" type="image/webp">
+            <source type="image/webp" srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-manuelle-sm.webp 800w, <?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-manuelle.webp 2048w" sizes="(max-width: 900px) 92vw, 300px">
             <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-manuelle.jpg" alt="Manuelle Therapie" loading="lazy" width="2048" height="1363" data-pagespeed-no-transform>
           </picture>
         </div>
@@ -30,7 +30,7 @@
       <article class="service-card">
         <div class="service-card-img">
           <picture>
-            <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-uebungen.webp" type="image/webp">
+            <source type="image/webp" srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-uebungen-sm.webp 800w, <?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-uebungen.webp 2048w" sizes="(max-width: 900px) 92vw, 300px">
             <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-uebungen.jpg" alt="Aktive Übungen" loading="lazy" width="2048" height="1363" data-pagespeed-no-transform>
           </picture>
         </div>
@@ -42,7 +42,7 @@
       <article class="service-card">
         <div class="service-card-img">
           <picture>
-            <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-atem.webp" type="image/webp">
+            <source type="image/webp" srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-atem-sm.webp 800w, <?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-atem.webp 2048w" sizes="(max-width: 900px) 92vw, 300px">
             <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-atem.jpg" alt="Atemtherapie" loading="lazy" width="2048" height="1363" data-pagespeed-no-transform>
           </picture>
         </div>
@@ -54,7 +54,7 @@
       <article class="service-card">
         <div class="service-card-img">
           <picture>
-            <source srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-beckenboden.webp" type="image/webp">
+            <source type="image/webp" srcset="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-beckenboden-sm.webp 800w, <?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-beckenboden.webp 2048w" sizes="(max-width: 900px) 92vw, 300px">
             <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/service-beckenboden.jpg" alt="Beckenbodentherapie" loading="lazy" width="2048" height="1362" data-pagespeed-no-transform>
           </picture>
         </div>

@@ -57,21 +57,8 @@ add_action( 'after_setup_theme', function () {
 
 add_action( 'wp_enqueue_scripts', function () {
 
-    // Schriften – lokal gehostet (kein Verbindungsaufbau zu Google, DSGVO)
-    wp_enqueue_style(
-        'physio-anne-fonts',
-        get_template_directory_uri() . '/assets/css/fonts.css',
-        [],
-        filemtime( get_template_directory() . '/assets/css/fonts.css' )
-    );
-
-    // Haupt-CSS
-    wp_enqueue_style(
-        'physio-anne-style',
-        get_template_directory_uri() . '/assets/css/style.css',
-        [ 'physio-anne-fonts' ],
-        filemtime( get_template_directory() . '/assets/css/style.css' )
-    );
+    // fonts.css und style.css werden nicht enqueued, sondern inline in den
+    // <head> geschrieben – siehe Abschnitt A2 weiter unten.
 
     // Haupt-JS (im Footer)
     wp_enqueue_script(
@@ -113,6 +100,56 @@ add_action( 'wp_enqueue_scripts', function () {
         );
     }
 } );
+
+/* ════════════════════════════════════════════════════════════
+   A2) CSS INLINE STATT ZWEI BLOCKIERENDER REQUESTS
+
+   fonts.css und style.css sind zusammen rund 43 KB unkomprimiert und standen
+   als <link> im <head>. Beide blockieren das Rendern: Lighthouse rechnet auf
+   Mobil 1.830 ms dafür, und die LCP-Aufschlüsselung weist 2.173 ms als
+   Element-Render-Delay aus – die Seite wartet also fast ausschließlich auf
+   diese zwei Dateien. Inline entfallen beide Requests.
+
+   Der Preis: Das CSS steht in jeder Seite neu im HTML statt aus dem
+   Browser-Cache zu kommen. Bei dieser Größe (gzip rund 8 KB) und einer Praxis-
+   Website, die überwiegend über eine einzelne Seite betreten wird, ist das der
+   bessere Tausch.
+
+   Wichtig: fonts.css verweist mit url('../fonts/…') relativ auf die
+   Schriftdateien. Relativ zu einer Seiten-URL liefe das ins Leere, deshalb
+   werden die Pfade beim Inlinen absolut gemacht.
+════════════════════════════════════════════════════════════ */
+
+add_action( 'wp_head', function () {
+
+    $dir = get_template_directory();
+    $uri = get_template_directory_uri();
+    $css = '';
+
+    foreach ( [ 'fonts', 'style' ] as $name ) {
+        $file = $dir . '/assets/css/' . $name . '.css';
+        $part = is_readable( $file ) ? file_get_contents( $file ) : '';
+
+        if ( '' === $part ) {
+            // Notausgang: Datei nicht lesbar. Lieber ein blockierender
+            // Request als eine Seite ohne Stylesheet. wp_print_styles läuft
+            // erst bei wp_head-Priorität 8, das Enqueue greift hier also noch.
+            wp_enqueue_style(
+                'physio-anne-' . $name,
+                $uri . '/assets/css/' . $name . '.css',
+                [],
+                filemtime( $file )
+            );
+            continue;
+        }
+
+        $css .= str_replace( "url('../fonts/", "url('" . $uri . "/assets/fonts/", $part );
+    }
+
+    if ( '' !== $css ) {
+        echo "<style id=\"physio-anne-css\">\n" . $css . "\n</style>\n";
+    }
+}, 2 );
 
 // Preload der Schriften, die above the fold gebraucht werden.
 // Ersetzt den früheren Preconnect zu Google – die Dateien liegen jetzt lokal.
@@ -371,8 +408,18 @@ add_action( 'wp_head', function () {
     echo '<meta name="twitter:image"       content="' . esc_url( $og_image ) . '">' . "\n";
 
     // Preload Hero-Image (nur Startseite)
+    // Mit imagesrcset/imagesizes, damit der Preload dieselbe Fassung holt,
+    // die das <img> später auswählt – sonst lädt Mobil zwei Dateien:
+    // die vorgeladene große und die per srcset gewählte -sm-Variante.
     if ( $slug === 'front-page' ) {
-        echo '<link rel="preload" as="image" href="' . esc_url( $theme_url . '/assets/images/hero-slide1.webp' ) . '" type="image/webp">' . "\n";
+        echo '<link rel="preload" as="image"'
+            . ' href="' . esc_url( $theme_url . '/assets/images/hero-slide1.webp' ) . '"'
+            . ' imagesrcset="' . esc_attr(
+                $theme_url . '/assets/images/hero-slide1-sm.webp 245w, '
+                . $theme_url . '/assets/images/hero-slide1.webp 547w'
+            ) . '"'
+            . ' imagesizes="(max-width: 768px) 123px, 547px"'
+            . ' type="image/webp">' . "\n";
     }
 
     // JSON-LD
@@ -745,8 +792,146 @@ add_filter( 'the_content', function ( $content ) {
     /* 2. Telefonnummer im tel:-Link.
        Der alte Stand verlinkt +43660774162 – eine Stelle zu wenig, der
        Anruf geht ins Leere. Korrekt ist +43 660 77 44 162. */
-    return str_replace( 'tel:+43660774162', 'tel:+436607744162', $content );
+    $content = str_replace( 'tel:+43660774162', 'tel:+436607744162', $content );
+
+    /* 3. Slider-Punkte aus dem Accessibility-Baum geholt.
+       Der DB-Stand setzt aria-hidden="true" auf den Container und lässt die
+       drei <button> darin fokussierbar. Damit existieren sie für Screenreader
+       und KI-Agenten nicht, sind per Tabulator aber erreichbar – axe meldet
+       das als aria-hidden-focus, Lighthouse zusätzlich als schlecht geformten
+       Baum in der Kategorie "Agentic Browsing". Das Pattern ist längst
+       korrigiert, der Datenbankinhalt nicht. */
+    $content = str_replace(
+        '<div class="hero-dots" aria-hidden="true">',
+        '<div class="hero-dots" role="group" aria-label="Slider-Navigation">',
+        $content
+    );
+
+    /* 4. Überschriftenebene im Werte-Streifen.
+       Dort steht <h4> direkt hinter der <h1> des Heros. Ebenen dürfen nicht
+       übersprungen werden, sonst verliert die Gliederung ihre Aussage. Die
+       Optik bleibt gleich, .intro-item h2 ist in style.css mitgeführt. */
+    $content = preg_replace_callback(
+        '#(<div class="intro-item">.*?)<h4>(.*?)</h4>#s',
+        function ( $m ) {
+            return $m[1] . '<h2>' . $m[2] . '</h2>';
+        },
+        $content
+    );
+
+    /* 5. Kontrast der Eyebrow-Zeile im CTA-Banner.
+       Inline gesetztes rgba(255,255,255,0.5) ergibt auf #4a2060 ein Verhältnis
+       von 4,32:1 – knapp unter den geforderten 4,5:1. 0.6 ergibt 5,53:1. */
+    return str_replace(
+        'color:rgba(255,255,255,0.5);',
+        'color:rgba(255,255,255,0.6);',
+        $content
+    );
 }, 20 );
+
+/* ── Bildmaße und passende Bildgrößen ────────────────────────
+
+   Der Datenbankinhalt liefert <img> ohne width/height und immer die große
+   Fassung: das Servicebild "Beckenboden" wiegt 140 KB und wird auf einer Karte
+   von 380 px Breite gezeigt. Lighthouse rechnet über alle Bilder 599 KB
+   Überschuss und meldet die fehlenden Maße separat.
+
+   Der Filter trägt width/height aus der Datei nach und hängt ein srcset an,
+   wo eine -sm-Fassung daneben liegt. Er läuft nach der WebP-Ersetzung
+   (Priorität 21), sieht also bereits die .webp-Pfade, und ist idempotent:
+   Tags, die width bzw. srcset schon mitbringen, bleiben unangetastet.
+
+   Die -sm-Dateien sind die 2x-Fassungen für Mobilgeräte. Die halbe
+   Pixelbreite ist deshalb genau die CSS-Breite, mit der sie dort erscheinen –
+   daraus wird das sizes-Attribut für den Hero abgeleitet. Servicekarten
+   bekommen ihre Kartenbreite, alles übrige eine halbseitige Spalte.
+──────────────────────────────────────────────────────────── */
+
+add_filter( 'the_content', function ( $content ) {
+
+    $theme_uri = get_template_directory_uri();
+    $theme_dir = get_template_directory();
+
+    return preg_replace_callback(
+        '#<img\s[^>]*>#i',
+        function ( $m ) use ( $theme_uri, $theme_dir ) {
+
+            $tag = $m[0];
+
+            if ( ! preg_match( '#\ssrc="([^"]+)"#i', $tag, $src ) ) {
+                return $tag;
+            }
+
+            $url = $src[1];
+            if ( 0 !== strpos( $url, $theme_uri ) ) {
+                return $tag; // fremde Quelle – nicht anfassen
+            }
+
+            $path = $theme_dir . strtok( substr( $url, strlen( $theme_uri ) ), '?' );
+            if ( ! is_readable( $path ) ) {
+                return $tag;
+            }
+
+            $size = @getimagesize( $path );
+            if ( ! $size ) {
+                return $tag;
+            }
+
+            // a) Maße nachtragen
+            if ( ! preg_match( '#\swidth=#i', $tag ) ) {
+                $tag = preg_replace(
+                    '#<img\s#i',
+                    sprintf( '<img width="%d" height="%d" ', $size[0], $size[1] ),
+                    $tag,
+                    1
+                );
+            }
+
+            // b) srcset, wenn eine -sm-Fassung existiert
+            $small_path = preg_replace( '#\.webp$#i', '-sm.webp', $path );
+
+            if ( preg_match( '#\ssrcset=#i', $tag )
+                 || $small_path === $path
+                 || ! is_readable( $small_path ) ) {
+                return $tag;
+            }
+
+            $small_size = @getimagesize( $small_path );
+            if ( ! $small_size ) {
+                return $tag;
+            }
+
+            $small_url = preg_replace( '#\.webp$#i', '-sm.webp', $url );
+
+            if ( false !== strpos( $url, 'hero-slide' ) ) {
+                $sizes = sprintf(
+                    '(max-width: 768px) %dpx, %dpx',
+                    (int) round( $small_size[0] / 2 ),
+                    $size[0]
+                );
+            } elseif ( false !== strpos( $url, 'service-' ) ) {
+                $sizes = '(max-width: 900px) 92vw, 300px';
+            } else {
+                $sizes = '(max-width: 900px) 100vw, 50vw';
+            }
+
+            return preg_replace(
+                '#<img\s#i',
+                sprintf(
+                    '<img srcset="%s %dw, %s %dw" sizes="%s" ',
+                    esc_url( $small_url ),
+                    $small_size[0],
+                    esc_url( $url ),
+                    $size[0],
+                    esc_attr( $sizes )
+                ),
+                $tag,
+                1
+            );
+        },
+        $content
+    );
+}, 21 );
 
 /**
  * Koordinaten der Praxis – exakt wie im Google Business Profile.
@@ -1010,10 +1195,16 @@ add_action( 'template_redirect', function () {
 
 ## Seiten
 
-- Startseite: https://physio-anne.at/
-- Über mich: https://physio-anne.at/ueber-mich/
-- Leistungen und Preise: https://physio-anne.at/leistungen/
-- Kontakt und Terminanfrage: https://physio-anne.at/kontakt/
+- [Startseite](https://physio-anne.at/): Überblick über Praxis und Leistungen
+- [Über mich](https://physio-anne.at/ueber-mich/): Werdegang und Behandlungsverständnis
+- [Leistungen und Preise](https://physio-anne.at/leistungen/): alle Therapieformen mit Honoraren und Kassenerstattung
+- [Kontakt und Terminanfrage](https://physio-anne.at/kontakt/): Anfahrt, Öffnungszeiten, Anfrageformular
+
+## Rechtliches
+
+- [Impressum](https://physio-anne.at/impressum/)
+- [Datenschutzerklärung](https://physio-anne.at/datenschutz/)
+- [AGB](https://physio-anne.at/agb/)
 
 TXT;
     exit;
