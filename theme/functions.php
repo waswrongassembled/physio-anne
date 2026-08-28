@@ -9,6 +9,62 @@
 defined( 'ABSPATH' ) || exit;
 
 /* ════════════════════════════════════════════════════════════
+   VERSIONSSTEMPEL FÜR THEME-ASSETS
+
+   Seit 1.0.26 liefert assets/.htaccess "immutable, max-age=31536000". Das
+   heißt wörtlich: Browser und Zwischenspeicher dürfen die Datei ein Jahr lang
+   als unveränderlich behandeln und fragen nicht mehr nach. Wird eine Datei
+   unter demselben Namen ausgetauscht, erreicht die Änderung deshalb niemanden
+   mehr – in 1.0.27 beim neu komprimierten logo-120.webp genau so passiert.
+
+   Der Stempel `?v=<Theme-Version>` löst das: Eine neue Theme-Version ergibt
+   neue URLs, und neue URLs sind für jeden Cache neue Dateien. Der Dateiname
+   selbst bleibt, wie er ist.
+
+   Nicht gestempelt werden bewusst die Bilder in OG-Metas und JSON-LD: Die
+   lesen Suchmaschinen und soziale Netze, dort ist eine saubere URL mehr wert
+   als Cache-Kontrolle.
+════════════════════════════════════════════════════════════ */
+
+function physio_anne_theme_version(): string {
+    static $version = null;
+
+    if ( null === $version ) {
+        $version = wp_get_theme()->get( 'Version' ) ?: '0';
+    }
+
+    return $version;
+}
+
+/**
+ * Absolute URL zu einer Theme-Datei, mit Versionsstempel.
+ *
+ * @param string $relative Pfad ab dem Theme-Ordner, mit führendem Schrägstrich.
+ */
+function physio_anne_asset( string $relative ): string {
+    return get_template_directory_uri() . $relative . '?v=' . physio_anne_theme_version();
+}
+
+/**
+ * Stempelt alle Theme-Asset-URLs in einem HTML- oder CSS-Abschnitt.
+ * Idempotent: URLs, die schon eine Abfrage tragen, bleibt sie erspart.
+ */
+function physio_anne_version_assets( string $markup ): string {
+    if ( false === strpos( $markup, '/assets/' ) ) {
+        return $markup;
+    }
+
+    $uri = get_template_directory_uri();
+    $ver = physio_anne_theme_version();
+
+    return preg_replace(
+        '#(' . preg_quote( $uri, '#' ) . '/assets/[\w./-]+\.(?:woff2?|webp|avif|png|jpe?g|gif|svg|ico|css|js))(?!\?)#i',
+        '$1?v=' . $ver,
+        $markup
+    );
+}
+
+/* ════════════════════════════════════════════════════════════
    PLATZHALTER-ERSETZUNG (Template Parts sind reines HTML)
 ════════════════════════════════════════════════════════════ */
 
@@ -19,7 +75,7 @@ add_filter( 'render_block', function ( $block_content ) {
     if ( strpos( $block_content, '{{MEDIA_URL}}' ) !== false ) {
         $block_content = str_replace( '{{MEDIA_URL}}', get_template_directory_uri() . '/assets/images', $block_content );
     }
-    return $block_content;
+    return physio_anne_version_assets( $block_content );
 } );
 
 /* ════════════════════════════════════════════════════════════
@@ -147,16 +203,16 @@ add_action( 'wp_head', function () {
     }
 
     if ( '' !== $css ) {
-        echo "<style id=\"physio-anne-css\">\n" . $css . "\n</style>\n";
+        echo "<style id=\"physio-anne-css\">\n" . physio_anne_version_assets( $css ) . "\n</style>\n";
     }
 }, 2 );
 
 // Preload der Schriften, die above the fold gebraucht werden.
 // Ersetzt den früheren Preconnect zu Google – die Dateien liegen jetzt lokal.
 add_action( 'wp_head', function () {
-    $t = get_template_directory_uri() . '/assets/fonts/';
     foreach ( [ 'cormorant-garamond-600-latin.woff2', 'dm-sans-400-latin.woff2' ] as $font ) {
-        echo '<link rel="preload" as="font" type="font/woff2" crossorigin href="' . esc_url( $t . $font ) . '">' . "\n";
+        $href = physio_anne_asset( '/assets/fonts/' . $font );
+        echo '<link rel="preload" as="font" type="font/woff2" crossorigin href="' . esc_url( $href ) . '">' . "\n";
     }
 }, 1 );
 
@@ -204,12 +260,11 @@ add_filter( 'language_attributes', function ( $output ) {
 ════════════════════════════════════════════════════════════ */
 
 add_action( 'wp_head', function () {
-    $t = get_template_directory_uri();
     echo "\n<!-- Favicons & App Icons -->\n";
-    echo '<link rel="icon" type="image/x-icon" href="' . esc_url( $t ) . '/assets/images/favicon.ico">' . "\n";
-    echo '<link rel="icon" type="image/png" sizes="32x32" href="' . esc_url( $t ) . '/assets/images/favicon-32x32.png">' . "\n";
-    echo '<link rel="icon" type="image/png" sizes="16x16" href="' . esc_url( $t ) . '/assets/images/favicon-16x16.png">' . "\n";
-    echo '<link rel="apple-touch-icon" sizes="180x180" href="' . esc_url( $t ) . '/assets/images/apple-touch-icon.png">' . "\n";
+    echo '<link rel="icon" type="image/x-icon" href="' . esc_url( physio_anne_asset( '/assets/images/favicon.ico' ) ) . '">' . "\n";
+    echo '<link rel="icon" type="image/png" sizes="32x32" href="' . esc_url( physio_anne_asset( '/assets/images/favicon-32x32.png' ) ) . '">' . "\n";
+    echo '<link rel="icon" type="image/png" sizes="16x16" href="' . esc_url( physio_anne_asset( '/assets/images/favicon-16x16.png' ) ) . '">' . "\n";
+    echo '<link rel="apple-touch-icon" sizes="180x180" href="' . esc_url( physio_anne_asset( '/assets/images/apple-touch-icon.png' ) ) . '">' . "\n";
     echo '<link rel="manifest" href="/site.webmanifest">' . "\n";
     echo '<meta name="theme-color" content="#9b6ebe">' . "\n";
     echo '<meta name="msapplication-TileColor" content="#9b6ebe">' . "\n";
@@ -231,7 +286,6 @@ add_filter( 'query_vars', function ( $vars ) {
 add_action( 'template_redirect', function () {
     if ( ! get_query_var( 'physio_manifest' ) ) return;
 
-    $t = get_template_directory_uri();
     $manifest = [
         'name'             => 'Physio Anne – Physiotherapie Feldkirch',
         'short_name'       => 'Physio Anne',
@@ -242,8 +296,8 @@ add_action( 'template_redirect', function () {
         'theme_color'      => '#9b6ebe',
         'lang'             => 'de-AT',
         'icons'            => [
-            [ 'src' => $t . '/assets/images/favicon-192x192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any maskable' ],
-            [ 'src' => $t . '/assets/images/favicon-512x512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any maskable' ],
+            [ 'src' => physio_anne_asset( '/assets/images/favicon-192x192.png' ), 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any maskable' ],
+            [ 'src' => physio_anne_asset( '/assets/images/favicon-512x512.png' ), 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any maskable' ],
         ],
     ];
 
@@ -413,10 +467,10 @@ add_action( 'wp_head', function () {
     // die vorgeladene große und die per srcset gewählte -sm-Variante.
     if ( $slug === 'front-page' ) {
         echo '<link rel="preload" as="image"'
-            . ' href="' . esc_url( $theme_url . '/assets/images/hero-slide1.webp' ) . '"'
+            . ' href="' . esc_url( physio_anne_asset( '/assets/images/hero-slide1.webp' ) ) . '"'
             . ' imagesrcset="' . esc_attr(
-                $theme_url . '/assets/images/hero-slide1-sm.webp 245w, '
-                . $theme_url . '/assets/images/hero-slide1.webp 547w'
+                physio_anne_asset( '/assets/images/hero-slide1-sm.webp' ) . ' 245w, '
+                . physio_anne_asset( '/assets/images/hero-slide1.webp' ) . ' 547w'
             ) . '"'
             . ' imagesizes="(max-width: 768px) 123px, 547px"'
             . ' type="image/webp">' . "\n";
@@ -867,7 +921,13 @@ add_filter( 'the_content', function ( $content ) {
                 return $tag; // fremde Quelle – nicht anfassen
             }
 
-            $path = $theme_dir . strtok( substr( $url, strlen( $theme_uri ) ), '?' );
+            // Der Versionsstempel hängt zu diesem Zeitpunkt schon dran. Für
+            // Dateizugriff und Namensableitung stört er, deshalb einmal abtrennen
+            // und die fertigen URLs am Ende neu stempeln.
+            $clean_url = strtok( $url, '?' );
+            $relative  = substr( $clean_url, strlen( $theme_uri ) );
+
+            $path = $theme_dir . $relative;
             if ( ! is_readable( $path ) ) {
                 return $tag;
             }
@@ -901,15 +961,16 @@ add_filter( 'the_content', function ( $content ) {
                 return $tag;
             }
 
-            $small_url = preg_replace( '#\.webp$#i', '-sm.webp', $url );
+            $small_url = physio_anne_asset( preg_replace( '#\.webp$#i', '-sm.webp', $relative ) );
+            $full_url  = physio_anne_asset( $relative );
 
-            if ( false !== strpos( $url, 'hero-slide' ) ) {
+            if ( false !== strpos( $relative, 'hero-slide' ) ) {
                 $sizes = sprintf(
                     '(max-width: 768px) %dpx, %dpx',
                     (int) round( $small_size[0] / 2 ),
                     $size[0]
                 );
-            } elseif ( false !== strpos( $url, 'service-' ) ) {
+            } elseif ( false !== strpos( $relative, 'service-' ) ) {
                 $sizes = '(max-width: 900px) 92vw, 300px';
             } else {
                 // 92vw statt 100vw: Der Container hat seitliches Polster, das
@@ -926,7 +987,7 @@ add_filter( 'the_content', function ( $content ) {
                     '<img srcset="%s %dw, %s %dw" sizes="%s" ',
                     esc_url( $small_url ),
                     $small_size[0],
-                    esc_url( $url ),
+                    esc_url( $full_url ),
                     $size[0],
                     esc_attr( $sizes )
                 ),

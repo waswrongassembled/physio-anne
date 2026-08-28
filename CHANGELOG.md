@@ -4,6 +4,22 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.28] 28.08.2026 – Versionsstempel für Theme-Assets
+
+### Behoben
+- **Geänderte Dateien erreichten niemanden mehr** (`functions.php`, neuer Abschnitt vor der Platzhalter-Ersetzung): `assets/.htaccess` liefert seit 1.0.26 `immutable, max-age=31536000`. Das heißt wörtlich, dass Browser und Zwischenspeicher die Datei ein Jahr lang als unveränderlich behandeln und nicht mehr nachfragen dürfen. In 1.0.27 wurde `logo-120.webp` unter demselben Namen neu komprimiert – live kam weiter die alte Fassung (8.446 statt 6.680 Bytes), nachweisbar daran, dass dieselbe URL mit angehängter Abfrage sofort die neue Datei lieferte.
+
+  Neu hängt das Theme an alle eigenen Asset-URLs `?v=<Theme-Version>`. Eine neue Version ergibt neue URLs, und neue URLs sind für jeden Cache neue Dateien. Der Dateiname bleibt unangetastet, die Regel „bei Änderung umbenennen" entfällt.
+
+  Gestempelt werden: Bilder und Logos aus Template-Parts und Seiteninhalt (über den `render_block`-Filter), die Schrift-Preloads, die Schriftpfade im Inline-CSS, das Hero-Preload samt `imagesrcset`, Favicons und die Icons im Webmanifest. Die Funktion ist idempotent – eine URL, die bereits eine Abfrage trägt, bleibt unberührt.
+
+  **Nicht** gestempelt werden die Bilder in OG-Metas und JSON-LD: Die lesen Suchmaschinen und soziale Netze, dort ist eine saubere URL mehr wert als Cache-Kontrolle.
+
+### Geändert
+- **Bildfilter arbeitet auf dem Pfad statt auf der URL** (`functions.php`): Der Stempel hängt zum Zeitpunkt des Filters schon dran, und `preg_replace( '#\.webp$#', '-sm.webp', … )` hätte auf `…webp?v=1.0.28` nicht mehr gegriffen – das `srcset` hätte zweimal dieselbe Datei mit zwei Breiten angegeben. Der Filter trennt die Abfrage jetzt ab, leitet Dateipfad und `-sm`-Namen aus dem sauberen Pfad ab und stempelt die fertigen URLs neu.
+
+---
+
 ## [1.0.27] 28.08.2026 – Kleine Fassungen für die Porträtbilder
 
 Nachtrag zu 1.0.25/1.0.26. Live gemessen nach 1.0.26: Performance 91, Accessibility 100, Best Practices 100, SEO 100, Agentic Browsing 100. LCP 3,9 → 2,8 s.
