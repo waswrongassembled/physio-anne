@@ -4,6 +4,12 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.2.3] 19.11.2026 – Testimonials besser lesbar
+
+### Behoben
+- **Testimonial-Zitate im Dark Mode schwer lesbar**: Die feine Cormorant-Kursive wurde durch die Graustufen-Glättung (`antialiased`) auf dunklem Grund zusätzlich ausgedünnt. Im Dark Mode jetzt `-webkit-font-smoothing: auto`; Schriftgröße in beiden Modi `clamp(19px, 2vw, 22px)` statt 20 px.
+- **Schließendes Anführungszeichen** war ein gerades `"` – jetzt typografisch `“` passend zum öffnenden `„`.
+
 ## [1.2.2] 19.11.2026 – Logo im Dark Mode weiß
 
 ### Geändert

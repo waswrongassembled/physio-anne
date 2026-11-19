@@ -684,7 +684,7 @@ p { line-height: 1.75; }
 }
 .testimonial-card blockquote {
   font-family: var(--font-serif);
-  font-size: 20px;
+  font-size: clamp(19px, 2vw, 22px);
   font-style: italic;
   font-weight: 400;
   line-height: 1.6;
@@ -692,7 +692,10 @@ p { line-height: 1.75; }
   margin-bottom: 20px;
 }
 .testimonial-card blockquote::before { content: '„'; }
-.testimonial-card blockquote::after  { content: '"'; }
+.testimonial-card blockquote::after  { content: '“'; }
+/* Feine Kursive auf dunklem Grund: Die Graustufen-Glättung (antialiased, am
+   body gesetzt) dünnt helle Schrift zusätzlich aus – hier aus. */
+:root[data-theme="dark"] .testimonial-card blockquote { -webkit-font-smoothing: auto; }
 .testimonial-card cite {
   font-size: 13px;
   color: var(--text-muted);
