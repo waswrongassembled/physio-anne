@@ -235,6 +235,27 @@ add_action( 'wp_enqueue_scripts', function () {
 }, 100 );
 
 /* ════════════════════════════════════════════════════════════
+   A3) FARBSCHEMA HELL / DUNKEL / SYSTEM
+
+   Die Wahl aus dem Umschalter im Footer liegt in localStorage
+   ("physio-anne-theme": light | dark | system) – kein Cookie, nichts geht an
+   den Server. Standard ohne Wahl: System (folgt der Geräteeinstellung).
+   Ohne JavaScript bleibt die Seite hell.
+
+   Das Skript steht als erstes im <head> und setzt data-theme="light" bzw.
+   "dark" am <html>, bevor gerendert wird – sonst blitzt die Seite beim Laden
+   kurz im falschen Modus auf. Bei "system" folgt es Änderungen der
+   Systemeinstellung live. main.js bedient die Knöpfe über
+   window.physioAnneTheme.
+════════════════════════════════════════════════════════════ */
+
+add_action( 'wp_head', function () {
+    ?>
+<script>(function(){var d=document.documentElement,k='physio-anne-theme',p,m=window.matchMedia('(prefers-color-scheme: dark)');try{p=localStorage.getItem(k)}catch(e){}if(p!=='dark'&&p!=='light')p='system';function a(){d.setAttribute('data-theme',p==='dark'||(p==='system'&&m.matches)?'dark':'light');d.setAttribute('data-theme-pref',p);document.dispatchEvent(new Event('physio-anne-theme'))}a();if(m.addEventListener)m.addEventListener('change',function(){if(p==='system')a()});window.physioAnneTheme={pref:function(){return p},set:function(v){p=v;try{localStorage.setItem(k,v)}catch(e){}a()}}})();</script>
+<?php
+}, 0 );
+
+/* ════════════════════════════════════════════════════════════
    B) WP HEAD CLEANER
 ════════════════════════════════════════════════════════════ */
 
@@ -271,9 +292,8 @@ add_action( 'wp_head', function () {
     echo '<link rel="icon" type="image/png" sizes="16x16" href="' . esc_url( physio_anne_asset( '/assets/images/favicon-16x16.png' ) ) . '">' . "\n";
     echo '<link rel="apple-touch-icon" sizes="180x180" href="' . esc_url( physio_anne_asset( '/assets/images/apple-touch-icon.png' ) ) . '">' . "\n";
     echo '<link rel="manifest" href="/site.webmanifest">' . "\n";
-    // Browserleiste passend zum Farbschema (Safari, Chrome mobil).
-    echo '<meta name="theme-color" content="#9b6ebe" media="(prefers-color-scheme: light)">' . "\n";
-    echo '<meta name="theme-color" content="#18131c" media="(prefers-color-scheme: dark)">' . "\n";
+    // Browserleiste: hell als Standard, im Dark Mode setzt main.js #18131c.
+    echo '<meta name="theme-color" content="#9b6ebe">' . "\n";
     echo '<meta name="msapplication-TileColor" content="#9b6ebe">' . "\n";
 }, 2 );
 
@@ -1169,7 +1189,12 @@ add_filter( 'the_content', function ( $content ) {
           statt „Name“. Direkt vor dem Button ist es der letzte Schritt. */
     if ( preg_match( '#<div class="wpcf7-turnstile[^"]*"[^>]*></div>\s*#', $content, $ts )
          && preg_match( '#<p>\s*<input[^>]*\bwpcf7-submit\b#', $content ) ) {
-        $widget  = trim( $ts[0] );
+        // Das Widget folgt von sich aus nur dem System (data-theme="auto").
+        // Das Mini-Skript gibt ihm die Wahl aus dem Farbschema-Umschalter mit,
+        // bevor api.js (im Footer) es rendert.
+        $widget  = trim( $ts[0] )
+            . '<script>(function(){var w=document.querySelector(".wpcf7-turnstile"),d=document.documentElement;'
+            . 'if(w)w.setAttribute("data-theme",d.getAttribute("data-theme-pref")==="system"?"auto":(d.getAttribute("data-theme")||"light"))})();</script>';
         $content = preg_replace_callback(
             '#<p>\s*<input[^>]*\bwpcf7-submit\b#',
             fn( $m ) => $widget . "\n" . $m[0],

@@ -4,6 +4,19 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.2.0] 19.11.2026 – Farbschema-Umschalter System / Hell / Dunkel
+
+### Neu
+- **Umschalter im Footer** (`parts/footer.html`, `main.js`): drei Knöpfe als Gruppe mit `aria-pressed`, auf Mobil 44 px hoch. Standard: System.
+- **Head-Skript** (`functions.php`, Abschnitt A3, `wp_head` Priorität 0): setzt `data-theme="light|dark"` am `<html>` vor dem ersten Rendern – kein Aufblitzen im falschen Modus. Wahl in `localStorage` (`physio-anne-theme`), kein Cookie, keine Übertragung. Bei „System“ folgt die Seite Änderungen der Geräteeinstellung live. Ohne JavaScript: hell.
+- **Turnstile** bekommt die Wahl als `data-theme` mit (light/dark, bei System `auto`).
+- **Browserleiste** (`theme-color`) folgt der Wahl.
+
+### Geändert
+- Dark-Mode-Variablen hängen an `:root[data-theme="dark"]` statt an `@media (prefers-color-scheme: dark)` – ein Block, keine Doppelpflege.
+
+Getestet (Vorschau): alle Kombinationen System/Hell/Dunkel × Gerät hell/dunkel inkl. Reload und Live-Wechsel der Systemeinstellung; axe erzwungen hell und dunkel ohne Verstoß.
+
 ## [1.1.0] 19.11.2026 – UX-Feinschliff, Versionssprung wegen Dark Mode
 
 Enthält alles aus 1.0.30. Der Dark Mode ist ein neues Feature – nach SemVer ein Minor-Release; 1.0.30 wurde nie installiert, live geht direkt 1.1.0.

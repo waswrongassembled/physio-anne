@@ -73,3 +73,29 @@ if (hamburger && mobileNav) {
     }
   });
 })();
+
+// ── Farbschema-Umschalter (Footer) ─────────────
+// Logik und Speicherung im <head>-Skript (functions.php, A3); hier nur die
+// Knöpfe und die Farbe der Browserleiste.
+(function () {
+  var buttons = document.querySelectorAll('[data-theme-set]');
+  var meta = document.querySelector('meta[name="theme-color"]');
+
+  function sync() {
+    var pref = window.physioAnneTheme ? window.physioAnneTheme.pref() : 'system';
+    buttons.forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-theme-set') === pref ? 'true' : 'false');
+    });
+    if (meta) {
+      meta.setAttribute('content', document.documentElement.getAttribute('data-theme') === 'dark' ? '#18131c' : '#9b6ebe');
+    }
+  }
+
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (window.physioAnneTheme) window.physioAnneTheme.set(b.getAttribute('data-theme-set'));
+    });
+  });
+  document.addEventListener('physio-anne-theme', sync);
+  sync();
+})();
