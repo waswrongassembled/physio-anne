@@ -4,6 +4,11 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.2.2] 19.11.2026 – Logo im Dark Mode weiß
+
+### Geändert
+- **Header-Logo im Dark Mode** weiß einfarbig (wie im Footer) statt auf heller Scheibe – die Scheibe wirkte im dunklen Header wie ein Fremdkörper. Variable `--logo-disc` entfällt; der Dark-Block setzt `--logo-filter-light` auf `brightness(0) invert(1)`.
+
 ## [1.2.1] 19.11.2026 – Preistabelle und Hinweise im Dark Mode
 
 ### Behoben
