@@ -58,6 +58,8 @@
   --dot:           rgba(107, 45, 139, 0.2);
   --photo-filter:  none;
   --logo-disc:     transparent;
+  --table-head:    #4a2060;   /* Kopf der Preistabelle                        */
+  --table-head-2:  #654178;   /* zweite Kopfzeile (wie bisher 85 % auf Weiß)  */
 
   /* Typography */
   --font-serif:  'Cormorant Garamond', 'Cormorant Garamond Fallback', Georgia, serif;
@@ -119,6 +121,17 @@
     --dot:           rgba(200, 168, 212, 0.3);
     --photo-filter:  brightness(0.9);
     --logo-disc:     #f3eef6;
+    --table-head:    #3a2550;
+    --table-head-2:  #4a3460;
+}
+
+/* Schatten tragen auf dunklem Grund nicht – Karten bekommen eine feine Linie */
+:root[data-theme="dark"] .pricing-note {
+  box-shadow: none;
+  border: 1px solid var(--border);
+}
+@media (min-width: 641px) {
+  :root[data-theme="dark"] .pricing-table-wrap { box-shadow: none; border: 1px solid var(--border); }
 }
 
 /* ── Farbschema-Umschalter (Footer) ── */
@@ -714,9 +727,11 @@ p { line-height: 1.75; }
 .pricing-table th, .pricing-table td { white-space: nowrap; }
 .pricing-table thead tr:first-child th[colspan="3"] { text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); }
 .pricing-table thead tr:first-child th[colspan="2"] { border-bottom: none; }
-.pricing-table thead tr:last-child th { font-size: 12px; opacity: 0.85; }
+/* Zweite Kopfzeile etwas heller abgesetzt – feste Farbe statt opacity,
+   sonst scheint im Dark Mode der Untergrund durch und die Schrift wird matt. */
+.pricing-table thead tr:last-child th { font-size: 12px; background: var(--table-head-2); color: rgba(255,255,255,0.9); }
 .pricing-table th {
-  background: var(--footer);
+  background: var(--table-head);
   color: var(--white);
   font-family: var(--font-sans);
   font-weight: 400;
@@ -748,12 +763,15 @@ p { line-height: 1.75; }
    15 px, schmale Spalte. Kein margin-bottom: Die Sektion hat schon
    padding-bottom, beides addiert ergab rund 190 px Leerraum. */
 .pricing-note {
-  max-width: 68ch;
-  margin: var(--space-md) auto 0;
-  font-size: 15px;
+  margin: 12px 0 0;
+  padding: 20px 28px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+  font-size: 14px;
   color: var(--text-muted);
   text-align: left;
-  line-height: 1.7;
+  line-height: 1.8;
 }
 .pricing-note strong { color: var(--text); font-weight: 500; }
 .pricing-note a { color: var(--primary-text); text-decoration: underline; }
@@ -1359,10 +1377,6 @@ body.page-template-default .site-main .section { margin-top: 0 !important; }
 }
 
 /* Preishinweis-Text: Außerhalb des Containers eigenen Seitenabstand geben */
-.pricing-note {
-  padding-left: 0;
-  padding-right: 0;
-}
 
 @media (max-width: 520px) {
   .pricing-table-wrap {
@@ -1405,6 +1419,8 @@ body.page-template-default .site-main .section { margin-top: 0 !important; }
     margin-bottom: 12px;
   }
   .pricing-table tbody:nth-of-type(even) td { background: none; }
+  :root[data-theme="dark"] .pricing-table tbody { box-shadow: none; border: 1px solid var(--border); }
+  .pricing-note { padding: 16px 20px; }
   .pricing-table tr {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

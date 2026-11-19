@@ -4,6 +4,13 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.2.1] 19.11.2026 – Preistabelle und Hinweise im Dark Mode
+
+### Behoben
+- **Hinweise unter der Preistabelle** hingen frei und schmaler als die Tabelle im Raum; im Dark Mode stachen die fetten Sätze grell heraus. Jetzt eine Karte in Tabellenbreite direkt unter der Tabelle (14 px, Zeilenhöhe 1,8). Die Ausweichregel `padding: 0` für `.pricing-note` entfällt.
+- **Tabellenkopf im Dark Mode** zu dunkel und matschig: eigene Variablen `--table-head` / `--table-head-2` (hell unverändert `#4a2060` / `#654178`, dunkel `#3a2550` / `#4a3460`, Weiß darauf ≥ 10:1). Die zweite Kopfzeile nutzt eine feste Farbe statt `opacity` – im Dunkeln schien sonst der Untergrund durch.
+- **Konturen im Dark Mode**: Tabelle, Hinweis-Karte und mobile Preiskarten bekommen statt des (unsichtbaren) Schattens eine feine Linie.
+
 ## [1.2.0] 19.11.2026 – Farbschema-Umschalter System / Hell / Dunkel
 
 ### Neu
