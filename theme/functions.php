@@ -223,9 +223,14 @@ add_action( 'wp_enqueue_scripts', function () {
     wp_dequeue_script( 'wp-block-library' );
 
     // CF7 nur auf Kontakt-Seite laden (unload-Handler blockiert bfcache auf allen anderen Seiten)
+    // Turnstile (CF7-Integration) ebenso: CF7 bindet api.js von
+    // challenges.cloudflare.com auf jeder Seite ein, sobald Schlüssel
+    // hinterlegt sind. Ohne Formular ist das nur eine unnötige Verbindung
+    // zu Cloudflare – Ladezeit und Datenschutz.
     if ( ! is_page( 'kontakt' ) ) {
         wp_dequeue_script( 'contact-form-7' );
         wp_dequeue_style( 'contact-form-7' );
+        wp_dequeue_script( 'cloudflare-turnstile' );
     }
 }, 100 );
 
@@ -309,6 +314,46 @@ add_action( 'template_redirect', function () {
 /* ════════════════════════════════════════════════════════════
    E) SEO / META TAGS / JSON-LD (wp_head, Prio 1)
 ════════════════════════════════════════════════════════════ */
+
+/**
+ * Eckdaten des Hero-Preloads der Startseite – eine Quelle für das
+ * <link>-Tag im <head> und den gleichlautenden HTTP-Header.
+ *
+ * @return array{href:string, srcset:string, sizes:string}
+ */
+function physio_anne_hero_preload(): array {
+    $full  = physio_anne_asset( '/assets/images/hero-slide1.webp' );
+    $small = physio_anne_asset( '/assets/images/hero-slide1-sm.webp' );
+
+    return array(
+        'href'   => $full,
+        'srcset' => $small . ' 245w, ' . $full . ' 547w',
+        'sizes'  => '(max-width: 768px) 123px, 547px',
+    );
+}
+
+/* Hero-Preload als HTTP-Header.
+   mod_pagespeed beim Hoster entfernt <link rel="preload" as="image"> aus dem
+   HTML (mit ?PageSpeed=off steht es drin, sonst nicht). Header fasst
+   mod_pagespeed nicht an. Der Browser kennt das Bild so schon mit den
+   Antwort-Headern, noch bevor er das HTML liest. */
+add_action( 'template_redirect', function () {
+    if ( ! is_front_page() || headers_sent() ) {
+        return;
+    }
+
+    $hero = physio_anne_hero_preload();
+
+    header(
+        sprintf(
+            'Link: <%s>; rel=preload; as=image; type="image/webp"; imagesrcset="%s"; imagesizes="%s"',
+            esc_url_raw( $hero['href'] ),
+            $hero['srcset'],
+            $hero['sizes']
+        ),
+        false
+    );
+} );
 
 /**
  * Slug der aktuell ausgelieferten Seite als Schlüssel für die SEO-Map.
@@ -465,14 +510,14 @@ add_action( 'wp_head', function () {
     // Mit imagesrcset/imagesizes, damit der Preload dieselbe Fassung holt,
     // die das <img> später auswählt – sonst lädt Mobil zwei Dateien:
     // die vorgeladene große und die per srcset gewählte -sm-Variante.
+    // mod_pagespeed streicht dieses Tag live; derselbe Preload geht deshalb
+    // zusätzlich als HTTP-Header raus (siehe physio_anne_hero_preload()).
     if ( $slug === 'front-page' ) {
+        $hero = physio_anne_hero_preload();
         echo '<link rel="preload" as="image"'
-            . ' href="' . esc_url( physio_anne_asset( '/assets/images/hero-slide1.webp' ) ) . '"'
-            . ' imagesrcset="' . esc_attr(
-                physio_anne_asset( '/assets/images/hero-slide1-sm.webp' ) . ' 245w, '
-                . physio_anne_asset( '/assets/images/hero-slide1.webp' ) . ' 547w'
-            ) . '"'
-            . ' imagesizes="(max-width: 768px) 123px, 547px"'
+            . ' href="' . esc_url( $hero['href'] ) . '"'
+            . ' imagesrcset="' . esc_attr( $hero['srcset'] ) . '"'
+            . ' imagesizes="' . esc_attr( $hero['sizes'] ) . '"'
             . ' type="image/webp">' . "\n";
     }
 
@@ -998,6 +1043,28 @@ add_filter( 'the_content', function ( $content ) {
         $content
     );
 }, 21 );
+
+/* ── Priorität für das Hero-Bild ─────────────────────────────
+
+   Der Datenbankinhalt liefert das erste Hero-Bild mit loading="eager", aber
+   ohne fetchpriority – das Pattern hat es, der DB-Stand nicht. Es ist das
+   LCP-Element der Startseite; ohne Hinweis lädt der Browser es mit normaler
+   Priorität hinter CSS und Schriften. Läuft nach dem Bildfilter (22) und
+   ist idempotent: Tags mit eigenem fetchpriority bleiben, wie sie sind.
+──────────────────────────────────────────────────────────── */
+
+add_filter( 'the_content', function ( $content ) {
+    return preg_replace_callback(
+        '#<img\s[^>]*hero-slide1[.-][^>]*>#i',
+        function ( $m ) {
+            if ( preg_match( '#\sfetchpriority=#i', $m[0] ) ) {
+                return $m[0];
+            }
+            return preg_replace( '#<img\s#i', '<img fetchpriority="high" ', $m[0], 1 );
+        },
+        $content
+    );
+}, 22 );
 
 /**
  * Koordinaten der Praxis – exakt wie im Google Business Profile.

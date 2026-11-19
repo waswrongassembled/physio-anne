@@ -4,6 +4,15 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.29] 19.11.2026 – Turnstile nur auf der Kontaktseite, Hero-Bild priorisiert
+
+### Behoben
+- **Hero-Preload kam live nie an** (`functions.php`, neue Funktion `physio_anne_hero_preload()` + `template_redirect`): mod_pagespeed beim Hoster entfernt `<link rel="preload" as="image">` aus dem HTML – mit `?PageSpeed=off` steht es im `<head>`, im normalen Abruf nicht. Derselbe Preload geht jetzt zusätzlich als HTTP-Header `Link: <…>; rel=preload; as=image; imagesrcset=…; imagesizes=…`; Header fasst mod_pagespeed nicht an. Tag und Header speisen sich aus derselben Funktion.
+- **Hero-Bild ohne `fetchpriority`** (`functions.php`, neuer `the_content`-Filter, Priorität 22): Der DB-Stand liefert das erste Hero-Bild (LCP-Element) mit `loading="eager"`, aber ohne `fetchpriority="high"` – das Pattern hat es, die Datenbank nicht. Der Filter ergänzt es, idempotent.
+
+### Geändert
+- **Turnstile-Script nur noch auf `/kontakt/`** (`functions.php`, Abschnitt CF7-Dequeue): Das Kontaktformular bekommt Spamschutz über die in Contact Form 7 (ab 6.x) eingebaute Cloudflare-Turnstile-Integration; die Schlüssel werden in WordPress unter Kontakt → Integration hinterlegt, nicht im Theme. CF7 bindet `challenges.cloudflare.com/turnstile/v0/api.js` (Handle `cloudflare-turnstile`) auf jeder Seite ein, sobald Schlüssel gesetzt sind. Das Theme entfernt es jetzt außerhalb der Kontaktseite, wie schon das CF7-Script selbst – keine unnötige Verbindung zu Cloudflare beim Besuch anderer Seiten.
+
 ## [1.0.28] 28.08.2026 – Versionsstempel für Theme-Assets
 
 ### Behoben
