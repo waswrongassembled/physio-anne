@@ -271,7 +271,9 @@ add_action( 'wp_head', function () {
     echo '<link rel="icon" type="image/png" sizes="16x16" href="' . esc_url( physio_anne_asset( '/assets/images/favicon-16x16.png' ) ) . '">' . "\n";
     echo '<link rel="apple-touch-icon" sizes="180x180" href="' . esc_url( physio_anne_asset( '/assets/images/apple-touch-icon.png' ) ) . '">' . "\n";
     echo '<link rel="manifest" href="/site.webmanifest">' . "\n";
-    echo '<meta name="theme-color" content="#9b6ebe">' . "\n";
+    // Browserleiste passend zum Farbschema (Safari, Chrome mobil).
+    echo '<meta name="theme-color" content="#9b6ebe" media="(prefers-color-scheme: light)">' . "\n";
+    echo '<meta name="theme-color" content="#18131c" media="(prefers-color-scheme: dark)">' . "\n";
     echo '<meta name="msapplication-TileColor" content="#9b6ebe">' . "\n";
 }, 2 );
 
@@ -316,8 +318,11 @@ add_action( 'template_redirect', function () {
 ════════════════════════════════════════════════════════════ */
 
 /**
- * Eckdaten des Hero-Preloads der Startseite – eine Quelle für das
- * <link>-Tag im <head> und den gleichlautenden HTTP-Header.
+ * Eckdaten des Hero-Preloads der Startseite für das <link>-Tag im <head>.
+ *
+ * Ein zusätzlicher Link-HTTP-Header (Theme 1.0.29) ist wieder entfernt: Der
+ * Hoster-Stack (Varnish/mod_pagespeed) streicht alle Link-Header, er kam nie
+ * beim Browser an.
  *
  * @return array{href:string, srcset:string, sizes:string}
  */
@@ -331,29 +336,6 @@ function physio_anne_hero_preload(): array {
         'sizes'  => '(max-width: 768px) 123px, 547px',
     );
 }
-
-/* Hero-Preload als HTTP-Header.
-   mod_pagespeed beim Hoster entfernt <link rel="preload" as="image"> aus dem
-   HTML (mit ?PageSpeed=off steht es drin, sonst nicht). Header fasst
-   mod_pagespeed nicht an. Der Browser kennt das Bild so schon mit den
-   Antwort-Headern, noch bevor er das HTML liest. */
-add_action( 'template_redirect', function () {
-    if ( ! is_front_page() || headers_sent() ) {
-        return;
-    }
-
-    $hero = physio_anne_hero_preload();
-
-    header(
-        sprintf(
-            'Link: <%s>; rel=preload; as=image; type="image/webp"; imagesrcset="%s"; imagesizes="%s"',
-            esc_url_raw( $hero['href'] ),
-            $hero['srcset'],
-            $hero['sizes']
-        ),
-        false
-    );
-} );
 
 /**
  * Slug der aktuell ausgelieferten Seite als Schlüssel für die SEO-Map.
@@ -1065,6 +1047,141 @@ add_filter( 'the_content', function ( $content ) {
         $content
     );
 }, 22 );
+
+/* ── Barrierefreiheit und Mobil-Darstellung im DB-Inhalt ───────
+   Befunde aus dem Audit vom 19.11.2026 (docs/AUDIT-2026-11-19.md). Wie
+   oben: Der Inhalt liegt in der Datenbank, deshalb laufen die Korrekturen
+   beim Ausliefern. Alle Schritte sind idempotent. Priorität 23, also nach
+   den Shortcodes (11) – das Kontaktformular steht hier schon im HTML.
+──────────────────────────────────────────────────────────── */
+
+/**
+ * Hängt einer HTML-Starttag-Zeichenkette eine Klasse an.
+ */
+function physio_anne_add_class( string $tag, string $class ): string {
+    if ( preg_match( '#\sclass="#', $tag ) ) {
+        return preg_replace( '#\sclass="#', ' class="' . $class . ' ', $tag, 1 );
+    }
+    return preg_replace( '#^<(\w+)#', '<$1 class="' . $class . '"', $tag, 1 );
+}
+
+/**
+ * Bereitet eine Preistabelle für Screenreader und schmale Displays auf.
+ *
+ * - Jede Leistung (eine Gruppe aus rowspan-Zeilen) wird eine eigene <tbody>.
+ *   Daran hängen die Zebrastreifen je Leistung und auf Mobil die Karten.
+ * - Jede Zelle bekommt data-label mit ihrem Spaltennamen aus der letzten
+ *   Kopfzeile; die mobile Kartenansicht zeigt ihn über dem Wert.
+ * - Klassen: cell-service (Leistungsname), col-kasse (Rückvergütung).
+ */
+function physio_anne_prepare_pricing_table( string $table ): string {
+
+    if ( false !== strpos( $table, 'data-label=' ) ) {
+        return $table; // schon aufbereitet
+    }
+
+    // Spaltennamen der letzten Kopfzeile: Dauer, Preis, ÖGK, BVAEB, SVS.
+    if ( ! preg_match( '#<thead>(.*?)</thead>#s', $table, $head )
+         || ! preg_match_all( '#<tr[^>]*>(.*?)</tr>#s', $head[1], $head_rows )
+         || ! preg_match_all( '#<th[^>]*>(.*?)</th>#s', end( $head_rows[1] ), $th ) ) {
+        return $table;
+    }
+    $labels     = array_map( fn( $t ) => trim( wp_strip_all_tags( $t ) ), $th[1] );
+    $price_col  = array_search( 'Preis', $labels, true );
+    $kasse_from = false === $price_col ? 2 : $price_col + 1;
+
+    if ( ! preg_match( '#<tbody>(.*?)</tbody>#s', $table, $body )
+         || ! preg_match_all( '#<tr[^>]*>.*?</tr>#s', $body[1], $rows ) ) {
+        return $table;
+    }
+
+    $groups    = array();
+    $remaining = 0;
+
+    foreach ( $rows[0] as $row ) {
+        $starts = $remaining <= 0;
+        if ( $starts ) {
+            $remaining = preg_match( '#<td[^>]*\browspan="(\d+)"#', $row, $rs ) ? (int) $rs[1] : 1;
+            $groups[]  = array();
+        }
+        $remaining--;
+
+        // Die erste Zeile einer Gruppe beginnt mit dem Leistungsnamen, danach
+        // folgen die Spalten der letzten Kopfzeile in ihrer Reihenfolge.
+        $index = $starts ? -1 : 0;
+        $row   = preg_replace_callback(
+            '#<td(\s[^>]*)?>#',
+            function ( $m ) use ( &$index, $labels, $kasse_from ) {
+                $attrs = $m[1] ?? '';
+                $i     = $index++;
+                if ( $i < 0 ) {
+                    return physio_anne_add_class( '<td' . $attrs . '>', 'cell-service' );
+                }
+                $tag = '<td' . $attrs . ' data-label="' . esc_attr( $labels[ $i ] ?? '' ) . '">';
+                return $i >= $kasse_from ? physio_anne_add_class( $tag, 'col-kasse' ) : $tag;
+            },
+            $row
+        );
+
+        $groups[ count( $groups ) - 1 ][] = $row;
+    }
+
+    $tbodies = '';
+    foreach ( $groups as $group ) {
+        $tbodies .= "<tbody>\n" . implode( "\n", $group ) . "\n</tbody>\n";
+    }
+
+    return str_replace( $body[0], $tbodies, $table );
+}
+
+add_filter( 'the_content', function ( $content ) {
+
+    /* 1. Preistabelle: Der scrollbare Wrapper muss per Tastatur erreichbar
+          und benannt sein; die Kopfzelle über Dauer/Preis war leer. */
+    if ( false !== strpos( $content, 'pricing-table' ) ) {
+        $content = str_replace(
+            '<div class="pricing-table-wrap">',
+            '<div class="pricing-table-wrap" role="region" aria-label="Preistabelle" tabindex="0">',
+            $content
+        );
+        $content = str_replace(
+            '<th colspan="2"></th>',
+            '<th colspan="2"><span class="visually-hidden">Behandlung</span></th>',
+            $content
+        );
+        $content = preg_replace_callback(
+            '#<table class="pricing-table">.*?</table>#s',
+            fn( $m ) => physio_anne_prepare_pricing_table( $m[0] ),
+            $content
+        );
+    }
+
+    /* 2. Karte: aria-label wirkt nur mit einer Rolle. */
+    $content = str_replace(
+        '<div id="map" aria-label=',
+        '<div id="map" role="region" aria-label=',
+        $content
+    );
+
+    /* 3. Turnstile vor den Absenden-Button.
+          CF7 setzt das Widget an den Formularanfang, weil im Formular kein
+          [turnstile]-Tag steht. Die erste Zeile lautete damit „Verifiziere …“
+          statt „Name“. Direkt vor dem Button ist es der letzte Schritt. */
+    if ( preg_match( '#<div class="wpcf7-turnstile[^"]*"[^>]*></div>\s*#', $content, $ts )
+         && preg_match( '#<p>\s*<input[^>]*\bwpcf7-submit\b#', $content ) ) {
+        $widget  = trim( $ts[0] );
+        $content = preg_replace_callback(
+            '#<p>\s*<input[^>]*\bwpcf7-submit\b#',
+            fn( $m ) => $widget . "\n" . $m[0],
+            str_replace( $ts[0], '', $content ),
+            1
+        );
+    }
+
+    /* 4. Tippfehler im Testimonial: gemeint ist die Sternotomie
+          (Eröffnung des Brustbeins), nicht „Sternometrie“. */
+    return str_replace( '(Sternometrie)', '(Sternotomie)', $content );
+}, 23 );
 
 /**
  * Koordinaten der Praxis – exakt wie im Google Business Profile.

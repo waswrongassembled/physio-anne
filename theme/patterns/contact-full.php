@@ -57,7 +57,7 @@
         </table>
 
         <div class="map-wrap" style="margin-top: 32px;">
-          <div id="map" aria-label="Standortkarte Physio Anne Feldkirch"></div>
+          <div id="map" role="region" aria-label="Standortkarte Physio Anne Feldkirch"></div>
           <?php echo physio_anne_map_consent_html(); ?>
         </div>
         <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">

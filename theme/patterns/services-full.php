@@ -128,12 +128,12 @@
       <h2 id="pricing-services-heading">Transparente Preise</h2>
       <p>Als Wahltherapeutin rechne ich direkt mit Ihnen ab. Alle Kassen erstatten einen Teil der Behandlungskosten – alle Rückerstattungstarife finden Sie in der Tabelle.</p>
     </div>
-    <div class="pricing-table-wrap">
+    <div class="pricing-table-wrap" role="region" aria-label="Preistabelle" tabindex="0">
       <table class="pricing-table">
         <thead>
           <tr>
             <th rowspan="2">Leistung</th>
-            <th colspan="2"></th>
+            <th colspan="2"><span class="visually-hidden">Behandlung</span></th>
             <th colspan="3">Rückvergütung Krankenkasse</th>
           </tr>
           <tr>

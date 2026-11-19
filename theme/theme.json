@@ -68,12 +68,12 @@
   },
   "styles": {
     "color": {
-      "background": "#faf8fb",
-      "text": "#2d2d2d"
+      "background": "var(--bg, #faf8fb)",
+      "text": "var(--text, #2d2d2d)"
     },
     "typography": {
       "fontFamily": "'DM Sans', system-ui, sans-serif",
-      "fontWeight": "300",
+      "fontWeight": "400",
       "lineHeight": "1.6"
     },
     "spacing": {

@@ -4,6 +4,29 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.0.30] 19.11.2026 – Dark Mode, Kontraste, Preistabelle mobil
+
+Umsetzung des Audits `docs/AUDIT-2026-11-19.md`. Vor dem Release geprüft mit einer lokalen Vorschau (Live-HTML + neuer Stand) und axe-core 4.11 (WCAG 2.2 AA + Best Practices): 7 Seiten × Desktop/Mobil × hell/dunkel ohne Verstoß.
+
+### Neu
+- **Eigener Dark Mode** (`assets/css/style.css`, Block „Dark Mode“): folgt `prefers-color-scheme`. Aubergine statt Schwarz (`--bg #18131c`), Lila und Teal für dunklen Grund aufgehellt, Buttons behalten die Markenfarben. Logo bekommt eine helle Scheibe, Fotos werden leicht gedämpft (`brightness(.9)`), Kartenkacheln abgedunkelt. `color-scheme: light dark` – damit greift Safaris adaptive Abdunklung (27.3) nicht mehr ein. `theme-color` hell/dunkel getrennt.
+- **Rollen-Variablen**: `--surface` (Karten, Header, Formular; vorher `--white`), `--primary-text`, `--teal-text`, `--teal-on-dark`, `--error`, `--hero-fade`, `--dot`, `--photo-filter`, `--logo-disc`. `--white` steht jetzt nur noch für Weiß als Schrift auf Lila/Teal.
+- **Preistabelle auf Mobil als Karten** (≤ 640 px): eine Karte pro Leistung, je Dauer oben Dauer + Preis, darunter ÖGK/BVAEB/SVS mit Beschriftung. Vorher lagen die Kassenspalten außerhalb des Bildschirms.
+
+### Behoben
+- **Kontraste** (WCAG 1.4.3): Lila `#9b6ebe` und Teal `#009ba5` als Textfarbe lagen bei 2,9–3,9:1. Aktiver Menüpunkt, Links in Rechtstexten, Eyebrows und Datenschutz-Link nutzen jetzt `--primary-text #7a4ea0` bzw. `--teal-text #00737b` (≥ 4,8:1). CF7-Button auf `#7a4ea0` (Weiß 6,1:1). Eyebrow im Bild-Hero und Footer-Hover in hellem Teal.
+- **Doppelte Landmarks**: Template-Parts in allen Templates mit `tagName: "div"` – vorher steckte `<header role="banner">` in einem weiteren `<header>`, ebenso beim Footer.
+- **Preistabelle** (`functions.php`, neuer `the_content`-Filter Priorität 23 + `physio_anne_prepare_pricing_table()`): Scroll-Wrapper mit `role="region"`, `aria-label`, `tabindex="0"`; leere Kopfzelle mit versteckter Beschriftung „Behandlung“; jede Leistung als eigene `<tbody>`, Zellen mit `data-label`. Zebrastreifen je Leistung statt je Zeile – springen nicht mehr bei den zusammengefassten Zeilen.
+- **Karte**: `div#map` hat zum `aria-label` jetzt `role="region"`.
+- **Touch-Ziele**: Menü-Button 44 × 44 statt 32 × 24, Slider-Punkte 44 statt 24 px, Footer-Links auf Mobil 44 px hoch, Telefon/E-Mail auf der Kontaktseite ≥ 24 px.
+- **Turnstile sitzt vor dem Absenden-Button** statt über dem Formular (derselbe Filter verschiebt das Widget im ausgelieferten HTML).
+- **Tippfehler im Testimonial**: „Sternometrie“ → „Sternotomie“.
+- **`theme.json`**: Body-Farben als `var(--bg)`/`var(--text)` – die globalen Styles hätten den Dark Mode sonst mit festen Hex-Werten überschrieben.
+
+### Geändert
+- **Typografie**: Fließtext DM Sans 400 statt 300, Rechtstexte/Karten/Listen 16 statt 15 px, Werte-Streifen 15 statt 14 px.
+- **Toter Link-Header entfernt** (aus 1.0.29): Der Hoster-Stack streicht alle `Link`-Header, der Hero-Preload kam so nie an. `physio_anne_hero_preload()` bleibt für das `<link>`-Tag.
+
 ## [1.0.29] 19.11.2026 – Turnstile nur auf der Kontaktseite, Hero-Bild priorisiert
 
 ### Behoben

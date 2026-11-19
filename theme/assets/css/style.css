@@ -43,14 +43,29 @@
   --bg:            #faf8fb;   /* Hauch Lavendel-Weiß                             */
   --bg-alt:        #f2eaf6;   /* Helles Lavendel                                 */
   --footer:        #4a2060;   /* Tiefes Dunkelviolett                            */
-  --white:         #ffffff;
+  --white:         #ffffff;   /* immer Weiß – Schrift auf Lila/Teal          */
   --border:        #e2d6ea;
+
+  /* Rollen statt Rohfarben – im Dark Mode unten neu belegt.
+     --primary/--teal bleiben für Flächen, Linien und große Schrift;
+     für Fließtext und Links reichen sie nicht an 4,5:1 heran. */
+  --surface:       #ffffff;   /* Karten, Header, Formular, Tabelle            */
+  --primary-text:  #7a4ea0;   /* Lila als Textfarbe: 5,8:1 auf --bg           */
+  --teal-text:     #00737b;   /* Teal als Textfarbe: 4,8:1 auch auf --bg-alt  */
+  --teal-on-dark:  #8fdde2;   /* Teal auf Dunkelviolett (Footer, Bild-Hero)   */
+  --error:         #c0392b;
+  --hero-fade:     242, 234, 246;              /* RGB von --bg-alt, für Verlauf */
+  --dot:           rgba(107, 45, 139, 0.2);
+  --photo-filter:  none;
+  --logo-disc:     transparent;
 
   /* Typography */
   --font-serif:  'Cormorant Garamond', 'Cormorant Garamond Fallback', Georgia, serif;
   --font-sans:   'DM Sans', 'DM Sans Fallback', system-ui, sans-serif;
 
-  color-scheme: light;
+  /* Hell und dunkel sind beide selbst gestaltet. Damit greift Safaris
+     adaptive Abdunklung (ab 27.3) nicht mehr eigenmächtig ein. */
+  color-scheme: light dark;
 
   /* Spacing */
   --space-xs:   8px;
@@ -72,6 +87,48 @@
   --logo-filter-dark:  brightness(0) invert(1);
 }
 
+/* ── Dark Mode ──
+   Abendstimmung in Aubergine statt Schwarz: Hintergründe tragen einen
+   Hauch Violett, Lila und Teal werden für dunklen Grund aufgehellt.
+   Buttons behalten ihre Markenfarben (Weiß darauf: 6,1:1 Lila, 4,8:1 Teal).
+   Kontraste Text auf --bg / --bg-alt / --surface:
+   --text 14,9 / 13,8 / 12,8 · --text-muted 7,3 / 6,8 / 6,3
+   --primary-text 8,7 / 8,1 / 7,5 · --teal-text 9,5 / 8,8 / 8,2 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary:       #b48fd4;
+    --primary-light: #33263f;
+    --teal:          #3fb8c0;
+    --lilac-mid:     #6e5580;
+    --text:          #ece6f0;
+    --text-muted:    #aaa0b3;
+    --bg:            #18131c;
+    --bg-alt:        #211a27;
+    --footer:        #2d1840;
+    --border:        #3a3044;
+
+    --surface:       #272030;
+    --primary-text:  #c7a6e3;
+    --teal-text:     #6cc9cf;
+    --error:         #ff8a80;
+    --hero-fade:     33, 26, 39;
+    --dot:           rgba(200, 168, 212, 0.3);
+    --photo-filter:  brightness(0.9);
+    --logo-disc:     #f3eef6;
+  }
+}
+
+/* Unsichtbar, aber für Screenreader vorhanden */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: auto; font-size: 16px; }
@@ -80,7 +137,7 @@ html { scroll-behavior: auto; font-size: 16px; }
 }
 body {
   font-family: var(--font-sans);
-  font-weight: 300;
+  font-weight: 400; /* 300 war für längere Texte zu zart */
   color: var(--text);
   background: var(--bg);
   line-height: 1.6;
@@ -110,7 +167,7 @@ p { line-height: 1.75; }
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--teal);
+  color: var(--teal-text);
 }
 
 /* ── Layout ── */
@@ -163,11 +220,12 @@ p { line-height: 1.75; }
 }
 .btn-outline {
   background: transparent;
-  color: var(--primary-dark);
-  border-color: var(--primary-dark);
+  color: var(--primary-text);
+  border-color: var(--primary-text);
 }
 .btn-outline:hover {
   background: var(--primary-dark);
+  border-color: var(--primary-dark);
   color: var(--white);
 }
 .btn-outline-white {
@@ -185,6 +243,10 @@ p { line-height: 1.75; }
   height: 52px;
   width: auto;
   filter: var(--logo-filter-light);
+  /* Dunkler Modus: helle Scheibe hinter dem runden Logo, damit Schriftzug
+     und Linien in den Markenfarben lesbar bleiben. */
+  background: var(--logo-disc);
+  border-radius: 50%;
 }
 .logo--dark img {
   filter: var(--logo-filter-dark);
@@ -197,7 +259,7 @@ p { line-height: 1.75; }
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 9999;
-  background: var(--white);
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
   transition: box-shadow var(--transition);
 }
@@ -236,20 +298,26 @@ p { line-height: 1.75; }
   transition: width var(--transition);
 }
 .main-nav a:hover,
-.main-nav a.active { color: var(--primary); }
+.main-nav a.active { color: var(--primary-text); }
 .main-nav a:hover::after,
 .main-nav a.active::after { width: 100%; }
 
 .header-cta { flex-shrink: 0; }
 
 /* Hamburger */
+/* Trefferfläche 44 × 44 px, das Symbol selbst bleibt 24 px breit */
 .hamburger {
   display: none;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 5px;
+  min-width: 44px;
+  min-height: 44px;
+  margin-right: -10px;
   background: none;
   border: none;
-  padding: 4px;
+  padding: 10px;
 }
 .hamburger span {
   display: block;
@@ -267,7 +335,7 @@ p { line-height: 1.75; }
   display: none;
   position: fixed;
   top: 76px; left: 0; right: 0;
-  background: var(--white);
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: var(--space-md);
   flex-direction: column;
@@ -284,7 +352,7 @@ p { line-height: 1.75; }
   transition: color var(--transition);
 }
 .mobile-nav a:last-child { border-bottom: none; }
-.mobile-nav a:hover { color: var(--primary); }
+.mobile-nav a:hover { color: var(--primary-text); }
 
 /* ────────────────────────────────────────
    HERO SLIDER
@@ -306,9 +374,9 @@ p { line-height: 1.75; }
   inset: 0;
   background: linear-gradient(
     to right,
-    rgba(242, 234, 246, 0.94) 0%,
-    rgba(242, 234, 246, 0.65) 45%,
-    rgba(242, 234, 246, 0.0) 75%
+    rgba(var(--hero-fade), 0.94) 0%,
+    rgba(var(--hero-fade), 0.65) 45%,
+    rgba(var(--hero-fade), 0.0) 75%
   );
   pointer-events: none;
   z-index: 2;
@@ -336,7 +404,7 @@ p { line-height: 1.75; }
 }
 .hero-text p {
   font-size: 17px;
-  font-weight: 300;
+  font-weight: 400;
   color: var(--text-muted);
   margin-bottom: 36px;
   max-width: 420px;
@@ -384,10 +452,11 @@ p { line-height: 1.75; }
   gap: 2px;
   z-index: 4;
 }
-/* Der Punkt bleibt optisch 8 px, die Schaltfläche misst 24 px – das ist die
-   Mindestgröße für Tippziele (axe target-size). Sichtbar ist das ::before. */
+/* Der Punkt bleibt optisch 8 px, die Schaltfläche misst 44 px – bequem
+   antippbar (WCAG fordert 24 px, Apple/Google empfehlen 44). Sichtbar ist
+   nur das ::before. */
 .hero-dot {
-  width: 24px; height: 24px;
+  width: 44px; height: 44px;
   padding: 0;
   border: none;
   background: none;
@@ -399,7 +468,7 @@ p { line-height: 1.75; }
   content: "";
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: rgba(107, 45, 139, 0.2);
+  background: var(--dot);
   transition: background var(--transition), transform var(--transition);
 }
 .hero-dot.active::before {
@@ -453,7 +522,7 @@ p { line-height: 1.75; }
     justify-content: center;
     margin: 0 0 32px;
     background: var(--bg-alt);
-    padding: 10px 0;
+    padding: 0;
   }
 }
 
@@ -461,7 +530,7 @@ p { line-height: 1.75; }
    INTRO STRIP
 ──────────────────────────────────────── */
 .intro-strip {
-  background: var(--white);
+  background: var(--surface);
   padding: 56px 0;
   border-bottom: 1px solid var(--border);
 }
@@ -487,7 +556,7 @@ p { line-height: 1.75; }
   margin-bottom: 8px;
 }
 .intro-item p {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-muted);
   line-height: 1.6;
 }
@@ -537,7 +606,7 @@ p { line-height: 1.75; }
   gap: var(--space-md);
 }
 .service-card {
-  background: var(--white);
+  background: var(--surface);
   border-radius: var(--radius-lg);
   box-shadow: 0 2px 16px rgba(0,0,0,0.06);
   transition: box-shadow var(--transition);
@@ -555,7 +624,7 @@ p { line-height: 1.75; }
 }
 .service-card-body { padding: 28px 32px 32px; }
 .service-card-body h3 { margin-bottom: 12px; font-size: 24px; }
-.service-card-body p { color: var(--text-muted); font-size: 15px; }
+.service-card-body p { color: var(--text-muted); font-size: 16px; }
 
 /* ────────────────────────────────────────
    TESTIMONIALS
@@ -566,7 +635,7 @@ p { line-height: 1.75; }
   gap: var(--space-md);
 }
 .testimonial-card {
-  background: var(--white);
+  background: var(--surface);
   border-radius: var(--radius-lg);
   padding: 36px 40px;
   border-left: 3px solid var(--teal);
@@ -603,10 +672,11 @@ p { line-height: 1.75; }
   border-radius: var(--radius-lg);
   box-shadow: 0 2px 20px rgba(0,0,0,0.07);
 }
+.pricing-table-wrap:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 .pricing-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--white);
+  background: var(--surface);
   font-size: 14px;
 }
 .pricing-table th, .pricing-table td { white-space: nowrap; }
@@ -635,7 +705,9 @@ p { line-height: 1.75; }
 .pricing-table td.col-dauer { text-align: center; color: var(--text); font-variant-numeric: normal; }
 .pricing-table td:first-child { font-weight: 400; }
 .pricing-table tr:last-child td { border-bottom: none; }
-.pricing-table tr:nth-child(even) td { background: var(--bg-alt); }
+/* Streifen je Leistung statt je Zeile: Die Gruppen mit rowspan stehen als
+   eigene <tbody> (siehe functions.php), so springt das Muster nicht mehr. */
+.pricing-table tbody:nth-of-type(even) td { background: var(--bg-alt); }
 .pricing-table td[rowspan] { border-bottom: 1px solid var(--border); font-weight: 500; vertical-align: middle; }
 .pricing-table .price-highlight { color: var(--text); font-weight: 500; }
 .pricing-table .price-pending { color: var(--text-muted); font-style: italic; font-size: 13px; }
@@ -647,7 +719,7 @@ p { line-height: 1.75; }
   text-align: center;
   line-height: 1.7;
 }
-.pricing-note a { color: var(--primary-dark); text-decoration: underline; }
+.pricing-note a { color: var(--primary-text); text-decoration: underline; }
 .section--pricing,
 .section:has(.pricing-note) { padding-bottom: var(--space-xl); }
 
@@ -741,7 +813,7 @@ p { line-height: 1.75; }
   line-height: 2.1;
   transition: color var(--transition);
 }
-.footer-col a:hover { color: var(--teal); }
+.footer-col a:hover { color: var(--teal-on-dark); }
 .footer-bottom {
   padding: 20px 0;
   display: flex;
@@ -781,7 +853,7 @@ p { line-height: 1.75; }
   align-items: center;
 }
 .page-hero-text { color: var(--white); }
-.page-hero-text .eyebrow { margin-bottom: 12px; }
+.page-hero-text .eyebrow { margin-bottom: 12px; color: var(--teal-on-dark); }
 .page-hero-text h1 { color: var(--white); font-weight: 300; }
 
 /* ────────────────────────────────────────
@@ -811,7 +883,9 @@ p { line-height: 1.75; }
 .contact-detail-body strong { display: block; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 2px; }
 .contact-detail-body a,
 .contact-detail-body span { font-size: 15px; color: var(--text); transition: color var(--transition); }
-.contact-detail-body a:hover { color: var(--primary); }
+.contact-detail-body a:hover { color: var(--primary-text); }
+/* Telefon/E-Mail: Trefferfläche ≥ 24 px hoch, ohne das Layout zu verschieben */
+.contact-detail-body a { display: inline-block; padding: 4px 0; margin: -4px 0; }
 
 .hours-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .hours-table td { padding: 8px 0; border-bottom: 1px solid var(--border); }
@@ -821,7 +895,7 @@ p { line-height: 1.75; }
 
 /* Contact form */
 .contact-form-wrap {
-  background: var(--white);
+  background: var(--surface);
   border-radius: var(--radius-lg);
   padding: 40px;
   box-shadow: 0 2px 20px rgba(0,0,0,0.06);
@@ -843,7 +917,7 @@ p { line-height: 1.75; }
   padding: 12px 16px;
   font-family: var(--font-sans);
   font-size: 15px;
-  font-weight: 300;
+  font-weight: 400;
   color: var(--text);
   background: var(--bg);
   border: 1.5px solid var(--border);
@@ -885,7 +959,7 @@ p { line-height: 1.75; }
   padding: 12px 16px;
   font-family: var(--font-sans);
   font-size: 15px;
-  font-weight: 300;
+  font-weight: 400;
   color: var(--text);
   background: var(--bg);
   border: 1.5px solid var(--border);
@@ -919,16 +993,18 @@ p { line-height: 1.75; }
   font-size: 15px;
   font-weight: 500;
   color: var(--white);
-  background: var(--primary);
+  background: var(--primary-dark); /* Weiß auf #7a4ea0: 6,1:1 */
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
   transition: background var(--transition);
 }
-.wpcf7-form .wpcf7-submit:hover { background: var(--primary-dark, #7a4a9e); }
+.wpcf7-form .wpcf7-submit:hover { background: var(--deep-purple); }
+/* Turnstile sitzt direkt vor dem Absenden-Button (siehe functions.php) */
+.wpcf7-form .wpcf7-turnstile { margin-bottom: 20px; }
 .form-datenschutz { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
-.form-datenschutz a { color: var(--teal); }
-.wpcf7-not-valid-tip { font-size: 12px; color: #c0392b; margin-top: 4px; }
+.form-datenschutz a { color: var(--teal-text); text-decoration: underline; }
+.wpcf7-not-valid-tip { font-size: 12px; color: var(--error); margin-top: 4px; }
 .wpcf7-response-output {
   margin-top: 16px;
   padding: 12px 16px;
@@ -938,11 +1014,11 @@ p { line-height: 1.75; }
 }
 .wpcf7-form.sent .wpcf7-response-output {
   border-color: transparent !important;
-  background: rgba(107, 45, 139, 0.08);
-  color: var(--primary) !important;
+  background: var(--primary-light);
+  color: var(--primary-text) !important;
 }
 .wpcf7-form.failed .wpcf7-response-output,
-.wpcf7-form.invalid .wpcf7-response-output { border-color: #c0392b; color: #c0392b; }
+.wpcf7-form.invalid .wpcf7-response-output { border-color: var(--error); color: var(--error); }
 .wpcf7-response-output:empty { display: none; }
 .wpcf7 { margin-bottom: 0 !important; }
 .wpcf7-form p:last-of-type { margin-bottom: 0; }
@@ -961,6 +1037,9 @@ p { line-height: 1.75; }
 .map-wrap #map { width: 100%; height: 100%; border: none; }
 /* Karte dezent entsättigen – passt zur ruhigen Ästhetik der Seite */
 .leaflet-tile-pane { filter: saturate(0.55) brightness(1.06); }
+@media (prefers-color-scheme: dark) {
+  .leaflet-tile-pane { filter: saturate(0.5) brightness(0.8) contrast(1.05); }
+}
 
 /* Einwilligung, bevor Kacheln von OpenStreetMap geladen werden */
 .map-consent {
@@ -1005,17 +1084,17 @@ p { line-height: 1.75; }
 .legal-content p {
   color: var(--text-muted);
   margin-bottom: 16px;
-  font-size: 15px;
+  font-size: 16px;
 }
 .legal-content ul {
   list-style: disc;
   padding-left: 24px;
   color: var(--text-muted);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.9;
   margin-bottom: 16px;
 }
-.legal-content a { color: var(--primary); text-decoration: underline; }
+.legal-content a { color: var(--primary-text); text-decoration: underline; }
 .legal-content strong { color: var(--text); font-weight: 500; }
 
 /* ────────────────────────────────────────
@@ -1056,7 +1135,7 @@ p { line-height: 1.75; }
   border-radius: 50%;
   background: var(--teal);
 }
-.credential-item span { font-size: 15px; color: var(--text-muted); }
+.credential-item span { font-size: 16px; color: var(--text-muted); }
 
 /* ────────────────────────────────────────
    SERVICES PAGE
@@ -1090,9 +1169,9 @@ p { line-height: 1.75; }
 }
 .service-category + .service-detail { margin-top: 0; }
 .service-category--primary { border-bottom-color: var(--primary); }
-.service-category--primary .eyebrow { color: var(--primary); }
-.service-category .eyebrow { margin-bottom: 6px; color: var(--teal); font-size: 13px; }
-.service-category p { color: var(--text-muted); font-size: 15px; margin: 0; }
+.service-category--primary .eyebrow { color: var(--primary-text); }
+.service-category .eyebrow { margin-bottom: 6px; color: var(--teal-text); font-size: 13px; }
+.service-category p { color: var(--text-muted); font-size: 16px; margin: 0; }
 .service-category--spacer { margin-top: var(--space-xl); }
 
 .section-narrow { max-width: 760px; margin: 0 auto; }
@@ -1101,12 +1180,12 @@ p { line-height: 1.75; }
 
 .info-cards { display: grid; gap: 20px; }
 .info-card {
-  background: var(--white);
+  background: var(--surface);
   border-radius: var(--radius-lg);
   padding: 28px 32px;
 }
 .info-card h3 { font-size: 18px; margin-bottom: 10px; }
-.info-card p { color: var(--text-muted); font-size: 15px; }
+.info-card p { color: var(--text-muted); font-size: 16px; }
 .info-card--primary { border-left: 4px solid var(--primary); }
 .info-card--teal    { border-left: 3px solid var(--teal); }
 .info-card--lilac   { border-left: 3px solid var(--lilac-mid); }
@@ -1137,6 +1216,17 @@ p { line-height: 1.75; }
   .form-row { grid-template-columns: 1fr; }
   .cta-banner .hours-grid { gap: 24px; }
   .footer-bottom { flex-direction: column; text-align: center; }
+
+  /* Footer-Links: 44 px hohe Trefferflächen statt 18 px Textzeile */
+  .footer-col a,
+  .footer-bottom-links a {
+    display: inline-block;
+    padding: 11px 0;
+    line-height: 22px;
+  }
+  .footer-col a + br { display: none; }
+  .footer-col p:has(a) { display: flex; flex-direction: column; align-items: flex-start; }
+  .footer-bottom-links { justify-content: center; gap: 24px; }
 }
 
 @media (max-width: 520px) {
@@ -1234,6 +1324,102 @@ body.page-template-default .site-main .section { margin-top: 0 !important; }
     width: 100% !important;
   }
 }
+
+/* ── Preistabelle auf schmalen Displays: eine Karte pro Leistung ──
+   Sechs Spalten passen nicht auf 390 px; bisher lagen die Kassenspalten
+   außerhalb des Bildschirms. Jede Leistung (eine <tbody>) wird zur Karte,
+   jede Dauer zu einem Block: oben Dauer und Preis, darunter die drei Kassen.
+   Die Beschriftungen kommen aus data-label (gesetzt in functions.php). */
+@media (max-width: 640px) {
+  .pricing-table-wrap,
+  .container .pricing-table-wrap {
+    width: 100% !important;
+    overflow: visible;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  .pricing-table-wrap { padding: 0 var(--space-sm); }
+  .container .pricing-table-wrap { padding: 0; }
+  .pricing-table,
+  .pricing-table tbody,
+  .pricing-table tr,
+  .pricing-table td { display: block; }
+  .pricing-table { min-width: 0; background: none; font-size: 15px; }
+  .pricing-table thead {
+    position: absolute; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0);
+  }
+  .pricing-table tbody {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    padding: 4px 20px;
+    margin-bottom: 12px;
+  }
+  .pricing-table tbody:nth-of-type(even) td { background: none; }
+  .pricing-table tr {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .pricing-table tr:last-child { border-bottom: none; }
+  .pricing-table td,
+  .pricing-table td[rowspan] {
+    padding: 0;
+    border: none;
+    white-space: normal;
+    text-align: left;
+  }
+  .pricing-table td.cell-service {
+    grid-column: 1 / -1;
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--text);
+    padding-bottom: 12px;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .pricing-table tr:has(.cell-service) { padding-top: 16px; }
+  .pricing-table tr:has(.cell-service) td.col-dauer,
+  .pricing-table tr:has(.cell-service) td.price-highlight { padding-top: 14px; }
+  .pricing-table td.col-dauer {
+    grid-column: 1 / 3;
+    text-align: left;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .pricing-table td.price-highlight {
+    grid-column: 3;
+    text-align: right;
+    font-size: 16px;
+  }
+  .pricing-table td.col-kasse {
+    margin-top: 8px;
+    color: var(--text-muted);
+    text-align: left;
+  }
+  .pricing-table td.col-kasse::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+}
+
+/* ── Fotos im Dark Mode leicht zurücknehmen ──
+   Die hellen Studiohintergründe würden sonst als Lichtblöcke im dunklen
+   Layout stehen. Nur abdunkeln, nie invertieren. */
+.hero-figure img,
+.about-split-img img,
+.about-full-img img,
+.service-card-img img,
+.service-detail-img img { filter: var(--photo-filter); }
 
 /* Service-Karten: Mindesthöhe für Bildfläche damit kein Kollaps bei fehlendem Bild */
 

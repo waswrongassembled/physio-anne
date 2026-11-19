@@ -19,7 +19,7 @@
         <cite>Tim K.</cite>
       </div>
       <div class="testimonial-card">
-        <blockquote>Nach einer schweren Operation (Sternometrie) war ich sehr unbeweglich mit dem Oberkörper. Anne konnte mir da sehr gut helfen mit ihren Übungen. Ich bekam sehr schnell einen Termin und kann sie nur weiter empfehlen !!</blockquote>
+        <blockquote>Nach einer schweren Operation (Sternotomie) war ich sehr unbeweglich mit dem Oberkörper. Anne konnte mir da sehr gut helfen mit ihren Übungen. Ich bekam sehr schnell einen Termin und kann sie nur weiter empfehlen !!</blockquote>
         <cite>Horst M.</cite>
       </div>
     </div>
