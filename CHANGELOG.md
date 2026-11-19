@@ -4,6 +4,17 @@ Alle relevanten Änderungen nach Version. Format: `[Version] Datum – Kurzbesch
 
 ---
 
+## [1.1.0] 19.11.2026 – UX-Feinschliff, Versionssprung wegen Dark Mode
+
+Enthält alles aus 1.0.30. Der Dark Mode ist ein neues Feature – nach SemVer ein Minor-Release; 1.0.30 wurde nie installiert, live geht direkt 1.1.0.
+
+### Geändert
+- **Termin-Button im mobilen Header** sichtbar (kompakt neben dem Menü). Vorher war auf Mobil oben nur das Menü.
+- **Hero-Slider ohne Autoplay**: Endloser Wechsel ohne Pause verstößt gegen WCAG 2.2.2; die Punkte bleiben zum Blättern.
+- **Preishinweise lesbar**: linksbündig, 15 px, schmale Spalte; Überweisungspflicht fett (Filter + Pattern).
+- **Leerraum nach der Preistabelle** halbiert (`margin-bottom` und Sektions-`padding` addierten sich zu rund 190 px).
+- **Werte-Streifen auf Mobil**: Symbol links, Text rechts – etwa halbe Höhe.
+
 ## [1.0.30] 19.11.2026 – Dark Mode, Kontraste, Preistabelle mobil
 
 Umsetzung des Audits `docs/AUDIT-2026-11-19.md`. Vor dem Release geprüft mit einer lokalen Vorschau (Live-HTML + neuer Stand) und axe-core 4.11 (WCAG 2.2 AA + Best Practices): 7 Seiten × Desktop/Mobil × hell/dunkel ohne Verstoß.

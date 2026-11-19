@@ -95,7 +95,7 @@
   </table>
 </div>
 <p class="pricing-note">
-  Alle Preise ohne Umsatzsteuer (USt-befreit gem. § 6 Abs. 1 Z 19 UStG) · Für eine Behandlung ist eine ärztliche Zuweisung (Überweisung) erforderlich.<br>
+  Alle Preise ohne Umsatzsteuer (USt-befreit gem. § 6 Abs. 1 Z 19 UStG) · <strong>Für eine Behandlung ist eine ärztliche Zuweisung (Überweisung) erforderlich.</strong><br>
   Die Rückerstattungsbeträge für ÖGK, BVAEB und SVS sind Richtwerte – bitte erkundigen Sie sich bei Ihrer Kasse.<br>
   * Heilmassage ist bei ÖGK, BVAEB und SVS nur additiv (zusätzlich zu einer Hauptleistung) und eingeschränkt erstattbar.<br>
   <strong>KFA-versichert?</strong> Rückerstattungstarife der Krankenfürsorgeanstalt (KFA) auf Anfrage – <a href="/kontakt/">einfach melden.</a><br>

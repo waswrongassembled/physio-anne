@@ -1178,7 +1178,15 @@ add_filter( 'the_content', function ( $content ) {
         );
     }
 
-    /* 4. Tippfehler im Testimonial: gemeint ist die Sternotomie
+    /* 4. Überweisungspflicht im Preishinweis hervorheben – ohne Zuweisung
+          keine Behandlung, das gehört nicht ins Kleingedruckte. */
+    $content = str_replace(
+        'Für eine Behandlung ist eine ärztliche Zuweisung (Überweisung) erforderlich.<br>',
+        '<strong>Für eine Behandlung ist eine ärztliche Zuweisung (Überweisung) erforderlich.</strong><br>',
+        $content
+    );
+
+    /* 5. Tippfehler im Testimonial: gemeint ist die Sternotomie
           (Eröffnung des Brustbeins), nicht „Sternometrie“. */
     return str_replace( '(Sternometrie)', '(Sternotomie)', $content );
 }, 23 );

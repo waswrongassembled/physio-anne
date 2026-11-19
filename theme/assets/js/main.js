@@ -34,8 +34,11 @@ if (hamburger && mobileNav) {
   const dots   = document.querySelectorAll('.hero-dot');
   if (!slides.length) return;
 
+  // Kein automatischer Wechsel mehr (1.1.0): Endlos wechselnde Inhalte
+  // ohne Pause-Möglichkeit verstoßen gegen WCAG 2.2.2, und die drei Bilder
+  // zeigen dieselbe Person – Autoplay brachte inhaltlich nichts. Die Punkte
+  // bleiben zum Durchblättern.
   let current = 0;
-  let timer;
 
   function goTo(idx) {
     slides[current].classList.remove('active');
@@ -45,24 +48,9 @@ if (hamburger && mobileNav) {
     dots[current]?.classList.add('active');
   }
 
-  function next() { goTo(current + 1); }
-
-  function start() {
-    timer = setInterval(next, 5000);
-  }
-
   dots.forEach((dot, i) => {
-    dot.addEventListener('click', () => {
-      clearInterval(timer);
-      goTo(i);
-      start();
-    });
+    dot.addEventListener('click', () => goTo(i));
   });
-
-  // Respect reduced motion
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    start();
-  }
 })();
 
 // ── Active nav link ────────────────────────────
